@@ -2,6 +2,23 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.1.
 
+This Angular application is a book store that is relying on the Open Library API for data.
+The project's stack consists of:
+
+- Angular
+- SCSS
+- BEM
+- Redux
+- Open Library API
+
+The app has the following pages:
+
+- a home page
+- a cart page
+- a book page
+
+The book page has a search feature with extensive filtering.
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
