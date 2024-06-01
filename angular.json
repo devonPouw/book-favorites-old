@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "my-shop": {
+    "book-favorites": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/my-shop",
+            "outputPath": "dist/book-favorites",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
@@ -60,10 +60,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "my-shop:build:production"
+              "buildTarget": "book-favorites:build:production"
             },
             "development": {
-              "buildTarget": "my-shop:build:development"
+              "buildTarget": "book-favorites:build:development"
             }
           },
           "defaultConfiguration": "development"
