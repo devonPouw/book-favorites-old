@@ -18,10 +18,13 @@ export class BookListComponent {
     q: '',
     offset: 0,
   };
+  isLoading: boolean;
 
   constructor(private service: BookStoreService) {
+    this.isLoading = true;
     this.service.getAll().subscribe((books: BookList) => {
       this.books = books;
+      this.isLoading = false;
       console.log(this.books.docs);
     });
   }

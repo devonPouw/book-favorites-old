@@ -11,6 +11,6 @@ export class BookStoreService {
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<BookList> {
-    return this.http.get<BookList>(`${this.apiUrl}/search.json?q=javascript`);
+    return this.http.get<BookList>(`${this.apiUrl}/search.json?q=twilight`);
   }
 }
