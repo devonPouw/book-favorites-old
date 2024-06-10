@@ -1,0 +1,7 @@
+<h1>Books</h1>
+<ul>
+  <li *ngFor="let book of books.docs">
+    <bf-book-list-item [book]="book"></bf-book-list-item>
+  </li>
+  <li *ngIf="!books.docs.length">No books available.</li>
+</ul>
