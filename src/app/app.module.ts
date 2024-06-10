@@ -8,9 +8,10 @@ import {
   withInterceptorsFromDi,
 } from '@angular/common/http';
 import { BooksModule } from './books/books.module';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, HomeComponent],
   imports: [BrowserModule, AppRoutingModule, BooksModule],
   providers: [provideHttpClient(withInterceptorsFromDi())],
   bootstrap: [AppComponent],
