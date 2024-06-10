@@ -1,0 +1,14 @@
+<a *ngIf="book">
+  <h2>{{ book.title }}</h2>
+  <img
+    [src]="'https://covers.openlibrary.org/b/id/' + book.cover_i + '-M.jpg'"
+    alt=""
+  />
+  <ul>
+    <li *ngFor="let author of book.author_name">
+      {{ author }}
+    </li>
+  </ul>
+
+  <p *ngIf="book.edition_count">{{ book.edition_count }}</p>
+</a>
