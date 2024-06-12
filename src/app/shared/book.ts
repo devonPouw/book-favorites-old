@@ -1,9 +1,15 @@
 export interface Book {
   cover_i: number;
-  has_fulltext: boolean;
-  edition_count: number;
   title: string;
   author_name: string[];
+  isbn: string[];
+  ratings_average: number;
+  ratings_count: number;
+  edition_key: string[];
+
+  has_fulltext: boolean;
+  first_sentence: string[];
+  edition_count: number;
   first_publish_year: number;
   key: string;
   ia: string[];
