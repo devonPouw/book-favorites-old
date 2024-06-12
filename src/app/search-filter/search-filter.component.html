@@ -1,0 +1,32 @@
+<input
+  type="search"
+  autocomplete="off"
+  aria-label="Search"
+  [class.loading]="isLoading()"
+  #searchInput
+  (input)="input$.next(searchInput.value)"
+/>
+
+@if (results$ | async; as results) {
+<ul class="search-results">
+  @for (book of results.docs; track book.edition_key[0]) {
+  <li>
+    <a [routerLink]="['/books', book.edition_key[0]]">
+      {{ book.title }}
+      @if (book.first_sentence) {
+      <p role="doc-subtitle">{{ book.first_sentence[0] }}</p>
+      } @if (book.isbn) {
+      <p>ISBN {{ book.isbn[0] }}</p>
+      }
+    </a>
+  </li>
+  } @empty {
+  <li>No results</li>
+  }
+</ul>
+} @else if (isLoading()) {
+<div class="loader">
+  Loading
+  <p class="loader__spinner"></p>
+</div>
+}
