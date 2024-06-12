@@ -1,14 +1,44 @@
-<a *ngIf="book">
+@if(book(); as book) {
+<a class="list-item">
   <h2>{{ book.title }}</h2>
+  @if(book.ratings_average){
+  <div style="display: flex; flex-direction: row">
+    @for (item of getStarsArray(book.ratings_average); track $index) {
+    <ng-container style="width: 30px">
+      <img
+        style="height: 24px; width: 24px"
+        src="star.svg"
+        alt="Star Rating"
+        [class.half]="
+          $index === parseRating(book.ratings_average) &&
+          book.ratings_average % 1 >= 0.5
+        "
+      />
+    </ng-container>
+    }
+
+    <p style="width: 40px">{{ book.ratings_average.toString().slice(0, 3) }}</p>
+    <p>({{ book.ratings_count }})</p>
+  </div>
+  } @if(book.cover_i) {
   <img
     [src]="'https://covers.openlibrary.org/b/id/' + book.cover_i + '-M.jpg'"
-    alt=""
+    alt="Cover"
+    width="120"
+    height="175"
   />
-  <ul>
-    <li *ngFor="let author of book.author_name">
+  }@else {
+  <img src="no-image-found.jpg" alt="" />
+  }
+  <ul class="comma-list">
+    By @for (author of book.author_name; track author) {
+    <li>
       {{ author }}
     </li>
+    }
   </ul>
-
-  <p *ngIf="book.edition_count">{{ book.edition_count }}</p>
+  @if (book.isbn) {
+  <p>ISBN {{ book.isbn[0] }}</p>
+  }
 </a>
+}

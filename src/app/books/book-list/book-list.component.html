@@ -1,15 +1,12 @@
 <h1>Books</h1>
-<ul>
-  <li *ngIf="isLoading; else bookList">
-    <div class="loader">
-      Loading...
-      <p class="loader__spinner"></p>
-    </div>
+@if (books(); as books) {
+<ul class="book-list">
+  @for (book of books.docs; track book.key) {
+  <li>
+    <bf-book-list-item [book]="book"></bf-book-list-item>
   </li>
-  <ng-template #bookList>
-    <li *ngFor="let book of books.docs">
-      <bf-book-list-item [book]="book"></bf-book-list-item>
-    </li>
-    <li *ngIf="!books.docs.length">No books available.</li>
-  </ng-template>
+  } @empty {
+  <li>No books available.</li>
+  }
 </ul>
+}
