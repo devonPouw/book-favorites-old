@@ -1,5 +1,5 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, Input } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 import { BookList } from './book-list';
 
@@ -10,9 +10,9 @@ export class BookStoreService {
   private apiUrl = 'https://openlibrary.org';
   constructor(private http: HttpClient) {}
 
-  getInitialRandom(): Observable<BookList> {
+  getInitial(): Observable<BookList> {
     return this.http
-      .get<BookList>(`${this.apiUrl}/search.json?q=*&limit=10&sort=random`)
+      .get<BookList>(`${this.apiUrl}/search.json?q=*&limit=10&sort=rating`)
       .pipe(
         catchError((err) => {
           console.error(err);
