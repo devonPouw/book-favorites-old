@@ -1,5 +1,11 @@
 <h1>Books</h1>
-@if (books(); as books) {
+<input type="text" placeholder="Search books" (input)="onInputChange($event)" />
+@if (isLoading()) {
+<div class="loader">
+  Loading
+  <p class="loader__spinner"></p>
+</div>
+} @if (books(); as books) {
 <ul class="book-list">
   @for (book of books.docs; track book.key) {
   <li>
