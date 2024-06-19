@@ -20,9 +20,21 @@ export class BookStoreService {
         })
       );
   }
-  searchBooks(query: string): Observable<BookList> {
+  searchBooks(
+    specialQuery: string,
+    title: string,
+    author: string,
+    isbn: string,
+    subject: string,
+    publisher: string,
+    person: string,
+    place: string,
+    sort: string
+  ): Observable<BookList> {
     return this.http
-      .get<BookList>(`${this.apiUrl}/search.json?q=${query}`)
+      .get<BookList>(
+        `${this.apiUrl}/search.json?q=${specialQuery}&title='${title}'&author='${author}'&isbn=${isbn}&subject='${subject}'&publisher='${publisher}'&person='${person}'&place='${place}'&sort=${sort}`
+      )
       .pipe(
         catchError((err) => {
           console.error(err);
