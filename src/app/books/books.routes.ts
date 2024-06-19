@@ -8,7 +8,7 @@ export const BOOKS_ROUTES: Routes = [
     component: BookListComponent,
   },
   {
-    path: ':isbn',
+    path: ':key',
     component: BookDetailsComponent,
   },
 ];

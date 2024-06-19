@@ -31,7 +31,7 @@
   <img src="no-image-found.jpg" alt="" />
   }
   <ul class="comma-list">
-    By @for (author of book.author_name; track author) {
+    By @for (author of book.author_name; track $index) {
     <li>
       {{ author }}
     </li>
