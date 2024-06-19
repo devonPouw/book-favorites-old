@@ -16,17 +16,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 export class BookListComponent implements OnInit {
   private bookStoreService = inject(BookStoreService);
   private specialQuery = '';
-  private title = '';
-  private author = '';
-  private isbn = '';
-  private publishYear1 = '';
-  private publishYear2 = '';
   private language = '';
-  private subject = '';
-  private publisher = '';
-  private person = '';
-  private place = '';
-  private sort = '';
   sortOptions = [
     'rating desc',
     'rating asc',
@@ -38,21 +28,20 @@ export class BookListComponent implements OnInit {
   ];
 
   books = signal<Partial<BookList>>({ docs: [] });
-  //fields do not reset yet
   searchForm = new FormGroup({
-    title: new FormControl(this.title),
-    author: new FormControl(this.author),
-    isbn: new FormControl(this.isbn),
-    publishYear1: new FormControl(this.publishYear1),
+    title: new FormControl(''),
+    author: new FormControl(''),
+    isbn: new FormControl(''),
+    publishYear1: new FormControl(''),
     publishYear2: new FormControl({
-      value: this.publishYear2,
+      value: '',
       disabled: true,
     }),
-    language: new FormControl(this.language),
-    subject: new FormControl(this.subject),
-    publisher: new FormControl(this.publisher),
-    person: new FormControl(this.person),
-    place: new FormControl(this.place),
+    language: new FormControl(''),
+    subject: new FormControl(''),
+    publisher: new FormControl(''),
+    person: new FormControl(''),
+    place: new FormControl(''),
     sort: new FormControl(this.sortOptions[0]),
   });
 
@@ -79,15 +68,6 @@ export class BookListComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.searchForm.value.title) {
-      this.title = this.searchForm.value.title.trim();
-    }
-    if (this.searchForm.value.author) {
-      this.author = this.searchForm.value.author.trim();
-    }
-    if (this.searchForm.value.isbn) {
-      this.isbn = this.searchForm.value.isbn.trim();
-    }
     if (
       this.searchForm.value.publishYear1 &&
       this.searchForm.value.publishYear2
@@ -95,6 +75,8 @@ export class BookListComponent implements OnInit {
       this.specialQuery = `first_publish_year%3A[${this.searchForm.value.publishYear1.trim()} TO ${this.searchForm.value.publishYear2.trim()}]`;
     } else if (this.searchForm.value.publishYear1) {
       this.specialQuery = `first_publish_year%3A${this.searchForm.value.publishYear1.trim()}`;
+    } else {
+      this.specialQuery = '';
     }
     if (this.searchForm.value.language) {
       this.language = this.searchForm.value.language.trim();
@@ -104,19 +86,6 @@ export class BookListComponent implements OnInit {
         this.specialQuery = `language%3A${this.language}`;
       }
     }
-    if (this.searchForm.value.subject) {
-      this.subject = this.searchForm.value.subject.trim();
-    }
-    if (this.searchForm.value.publisher) {
-      this.publisher = this.searchForm.value.publisher.trim();
-    }
-    if (this.searchForm.value.person) {
-      this.person = this.searchForm.value.person.trim();
-    }
-    if (this.searchForm.value.place) {
-      this.place = this.searchForm.value.place.trim();
-    }
-    this.sort = this.searchForm.value.sort ?? this.sortOptions[0];
     if (!this.specialQuery) {
       this.specialQuery = '*';
     }
@@ -124,14 +93,14 @@ export class BookListComponent implements OnInit {
     this.bookStoreService
       .searchBooks(
         this.specialQuery,
-        this.title,
-        this.author,
-        this.isbn,
-        this.subject,
-        this.publisher,
-        this.person,
-        this.place,
-        this.sort
+        this.searchForm.value.title?.trim() ?? '',
+        this.searchForm.value.author?.trim() ?? '',
+        this.searchForm.value.isbn?.trim() ?? '',
+        this.searchForm.value.subject?.trim() ?? '',
+        this.searchForm.value.publisher?.trim() ?? '',
+        this.searchForm.value.person?.trim() ?? '',
+        this.searchForm.value.place?.trim() ?? '',
+        this.searchForm.value.sort ?? this.sortOptions[0]
       )
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe((books) => {
