@@ -371,3 +371,20 @@ body {
     margin: 0;
   }
 }
+@media only screen and (max-width: 500px) {
+  .book-list .list-item {
+    padding-left: 0px;
+    padding-right: 0px;
+    font-size: 0.8rem;
+    display: block;
+  }
+  .book-list img {
+    width: 100px;
+  }
+  .book-list h2 {
+    font-size: 1.1rem;
+  }
+  ul.comma-list {
+    width: 100%;
+  }
+}
