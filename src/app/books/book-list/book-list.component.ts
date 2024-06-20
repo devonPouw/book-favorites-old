@@ -1,7 +1,7 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { BookStoreService } from '../../shared/book-store.service';
 import { BookListItemComponent } from '../book-list-item/book-list-item.component';
-import { finalize } from 'rxjs';
+import { Observable } from 'rxjs';
 import { BookList } from '../../shared/book-list';
 import { AsyncPipe, NgIf } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -27,7 +27,8 @@ export class BookListComponent implements OnInit {
     'scans',
   ];
 
-  books = signal<Partial<BookList>>({ docs: [] });
+  books$: Observable<BookList> = this.bookStoreService.getInitial();
+
   searchForm = new FormGroup({
     title: new FormControl(''),
     author: new FormControl(''),
@@ -45,18 +46,7 @@ export class BookListComponent implements OnInit {
     sort: new FormControl(this.sortOptions[0]),
   });
 
-  isLoading = signal(false);
-
   ngOnInit() {
-    this.isLoading.set(true);
-
-    this.bookStoreService
-      .getInitial()
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe((books) => {
-        this.books.set(books);
-      });
-
     this.searchForm.get('publishYear1')?.valueChanges.subscribe((value) => {
       if (value) {
         this.searchForm.get('publishYear2')?.enable();
@@ -89,22 +79,17 @@ export class BookListComponent implements OnInit {
     if (!this.specialQuery) {
       this.specialQuery = '*';
     }
-    this.isLoading.set(true);
-    this.bookStoreService
-      .searchBooks(
-        this.specialQuery,
-        this.searchForm.value.title?.trim() ?? '',
-        this.searchForm.value.author?.trim() ?? '',
-        this.searchForm.value.isbn?.trim() ?? '',
-        this.searchForm.value.subject?.trim() ?? '',
-        this.searchForm.value.publisher?.trim() ?? '',
-        this.searchForm.value.person?.trim() ?? '',
-        this.searchForm.value.place?.trim() ?? '',
-        this.searchForm.value.sort ?? this.sortOptions[0]
-      )
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe((books) => {
-        this.books.set(books);
-      });
+
+    this.books$ = this.bookStoreService.searchBooks(
+      this.specialQuery,
+      this.searchForm.value.title?.trim() ?? '',
+      this.searchForm.value.author?.trim() ?? '',
+      this.searchForm.value.isbn?.trim() ?? '',
+      this.searchForm.value.subject?.trim() ?? '',
+      this.searchForm.value.publisher?.trim() ?? '',
+      this.searchForm.value.person?.trim() ?? '',
+      this.searchForm.value.place?.trim() ?? '',
+      this.searchForm.value.sort ?? this.sortOptions[0]
+    );
   }
 }

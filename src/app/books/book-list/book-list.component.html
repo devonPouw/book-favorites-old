@@ -1,4 +1,3 @@
-<h1>Books</h1>
 <form [formGroup]="searchForm" (ngSubmit)="onSubmit()">
   <input type="text" placeholder="Lord of the Rings" formControlName="title" />
   <input type="text" placeholder="Roald Dahl" formControlName="author" />
@@ -23,12 +22,9 @@
   </select>
   <button type="submit">Search</button>
 </form>
-@if (isLoading()) {
-<div class="loader">
-  Loading
-  <p class="loader__spinner"></p>
-</div>
-} @if (books(); as books) {
+<h1>Books</h1>
+
+@if (books$ | async; as books) {
 <ul class="book-list">
   @for (book of books.docs; track book.key) {
   <li>
@@ -38,4 +34,8 @@
   <li>No books available.</li>
   }
 </ul>
+} @else {
+<div class="loader">
+  <p class="loader__spinner"></p>
+</div>
 }
