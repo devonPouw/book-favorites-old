@@ -57,6 +57,12 @@ export class BookListComponent implements OnInit {
     });
   }
 
+  clearForm() {
+    this.searchForm.reset();
+    this.searchForm.get('sort')?.setValue(this.sortOptions[0]);
+    this.searchForm.get('publishYear2')?.disable();
+  }
+
   onSubmit() {
     if (
       this.searchForm.value.publishYear1 &&
