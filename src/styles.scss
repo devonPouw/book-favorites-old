@@ -290,7 +290,6 @@ select {
   margin: 0em;
   max-width: 100%;
   text-align: left;
-  padding: 0.7em 1em;
   box-shadow: none;
   padding-right: 2.7em !important;
   border-radius: 0.3rem;
@@ -299,7 +298,7 @@ select {
 /* form styles */
 form input {
   width: calc(50% - 4em);
-  margin: 5px 0 22px 0;
+  margin: 5px 0 11px 0;
 }
 form textarea {
   width: calc(100% - 2.4em);
@@ -370,56 +369,5 @@ body {
   }
   nav .actions button {
     margin: 0;
-  }
-}
-
-@media only screen and (max-width: 600px) {
-  nav .actions {
-    justify-content: flex-end;
-  }
-}
-
-@media only screen and (max-width: 500px) {
-  nav > a {
-    padding: 0.7em;
-  }
-
-  nav > a:last-of-type {
-    margin-right: 0;
-  }
-}
-
-@media only screen and (max-width: 460px) {
-  /* move button logout underneath top navbar */
-  h2 {
-    font-size: 1.2em;
-  }
-
-  [role="doc-subtitle"] {
-    font-size: 1.1rem;
-  }
-
-  .book-list img {
-    grid-area: thumbnail;
-    min-width: 100px;
-    width: 100px;
-    height: 100px;
-  }
-
-  .book-list .list-item {
-    column-gap: 2em;
-    grid-template-columns: 1fr 2fr;
-  }
-}
-@media only screen and (max-width: 360px) {
-  .book-list img {
-    grid-area: thumbnail;
-    min-width: 80px;
-    width: 80px;
-    height: 100px;
-  }
-
-  .book-list .list-item {
-    column-gap: 1em;
   }
 }
