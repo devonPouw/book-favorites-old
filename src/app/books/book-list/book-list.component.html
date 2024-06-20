@@ -1,26 +1,56 @@
 <form [formGroup]="searchForm" (ngSubmit)="onSubmit()">
-  <input type="text" placeholder="Lord of the Rings" formControlName="title" />
-  <input type="text" placeholder="Roald Dahl" formControlName="author" />
-  <input type="number" placeholder="1234567890" formControlName="isbn" />
+  <label for="title">Title</label>
+  <div
+    style="display: flex; align-items: baseline; justify-content: space-between"
+  >
+    <input
+      type="text"
+      placeholder="Lord of the Rings"
+      formControlName="title"
+    />
+    <select formControlName="sort">
+      @for (item of sortOptions; track $index) {
+      <option [value]="item">{{ item }}</option>
+      }
+    </select>
+  </div>
+  <label for="author">Author</label>
+  <div>
+    <input type="text" placeholder="Roald Dahl" formControlName="author" />
+  </div>
+
+  <label for="isbn">ISBN</label>
+  <div>
+    <input type="number" placeholder="1234567890" formControlName="isbn" />
+  </div>
+  <label for="publishYear1">Year published</label>
   <div style="display: flex; align-items: baseline">
     <input type="string" placeholder="2000" formControlName="publishYear1" />
-    <p>To</p>
+    <p style="margin: 5px 5px 5px 5px">To</p>
     <input type="string" placeholder="2020" formControlName="publishYear2" />
   </div>
-  <input type="text" placeholder="eng" formControlName="language" />
-  <input type="text" placeholder="fantasy" formControlName="subject" />
-  <input
-    type="text"
-    placeholder="Houghton Mifflin Harcourt"
-    formControlName="publisher"
-  />
-  <input type="text" placeholder="Harry Potter" formControlName="person" />
-  <select formControlName="sort">
-    @for (item of sortOptions; track $index) {
-    <option [value]="item">{{ item }}</option>
-    }
-  </select>
-  <button type="button" (click)="clearForm()">Reset</button>
+
+  <label for="language">Language</label>
+  <div>
+    <input type="text" placeholder="eng" formControlName="language" />
+  </div>
+  <label for="subject">Subject</label>
+  <div>
+    <input type="text" placeholder="fantasy" formControlName="subject" />
+  </div>
+  <label for="publisher">Publisher</label>
+  <div>
+    <input
+      type="text"
+      placeholder="Houghton Mifflin Harcourt"
+      formControlName="publisher"
+    />
+  </div>
+  <label for="person">Character</label>
+  <div>
+    <input type="text" placeholder="Harry Potter" formControlName="person" />
+  </div>
+  <button type="button" (click)="clearForm()">Reset fields</button>
   <button type="submit">Search</button>
 </form>
 <h1>Books</h1>
