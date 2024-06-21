@@ -1,18 +1,23 @@
 <form [formGroup]="searchForm" (ngSubmit)="onSubmit()">
   <label for="title">Title</label>
-  <div
-    style="display: flex; align-items: baseline; justify-content: space-between"
-  >
+  <div style="display: flex; justify-content: space-between">
     <input
       type="text"
       placeholder="Lord of the Rings"
       formControlName="title"
     />
-    <select formControlName="sort">
-      @for (item of sortOptions; track $index) {
-      <option [value]="item">{{ item }}</option>
-      }
-    </select>
+    <div>
+      <select formControlName="sort">
+        @for (item of sortOptions; track $index) {
+        <option [value]="item">{{ item }}</option>
+        }
+      </select>
+      <select formControlName="limit">
+        @for (item of limitOptions; track $index) {
+        <option [value]="item">{{ item }}</option>
+        }
+      </select>
+    </div>
   </div>
   <label for="author">Author</label>
   <div>
@@ -24,7 +29,7 @@
     <input type="number" placeholder="1234567890" formControlName="isbn" />
   </div>
   <label for="publishYear1">Year published</label>
-  <div style="display: flex; align-items: baseline">
+  <div style="display: flex">
     <input
       style="margin-right: 5px"
       type="string"
@@ -56,7 +61,7 @@
 </form>
 <h1>Books</h1>
 
-@if (books$ | async; as books) {
+@if (books(); as books) {
 <ul class="book-list">
   @for (book of books.docs; track book.key) {
   <li>
@@ -66,7 +71,25 @@
   <li>No books available.</li>
   }
 </ul>
-} @else {
+@if (totalPages(); as totalPages;) {
+<div class="pagination">
+  <button [disabled]="page() === 1" (click)="selectPage(1)">&lt;&lt;</button>
+  <button [disabled]="page() === 1" (click)="selectPage(page() - 1)">
+    &lt;
+  </button>
+  @for (page of visiblePages(); track $index) {
+  <button [disabled]="page === currentPage()" (click)="selectPage(page)">
+    {{ page }}
+  </button>
+  }
+  <button [disabled]="page() === totalPages" (click)="selectPage(page() + 1)">
+    >
+  </button>
+  <button [disabled]="page() === totalPages" (click)="selectPage(totalPages)">
+    >>
+  </button>
+</div>
+} } @else {
 <div class="loader">
   <p class="loader__spinner"></p>
 </div>

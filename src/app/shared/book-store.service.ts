@@ -29,11 +29,13 @@ export class BookStoreService {
     publisher: string,
     person: string,
     place: string,
-    sort: string
+    sort: string,
+    limit: number,
+    page: number
   ): Observable<BookList> {
     return this.http
       .get<BookList>(
-        `${this.apiUrl}/search.json?q=${specialQuery}&title='${title}'&author='${author}'&isbn=${isbn}&subject='${subject}'&publisher='${publisher}'&person='${person}'&place='${place}'&sort=${sort}`
+        `${this.apiUrl}/search.json?q=${specialQuery}&title='${title}'&author='${author}'&isbn=${isbn}&subject='${subject}'&publisher='${publisher}'&person='${person}'&place='${place}'&sort=${sort}&limit=${limit}&page=${page}`
       )
       .pipe(
         catchError((err) => {
