@@ -59,38 +59,44 @@
   <button type="button" (click)="clearForm()">Reset fields</button>
   <button type="submit">Search</button>
 </form>
-<h1>Books</h1>
 
-@if (books(); as books) {
-<ul class="book-list">
-  @for (book of books.docs; track book.key) {
-  <li>
-    <bf-book-list-item [book]="book"></bf-book-list-item>
-  </li>
-  } @empty {
-  <li>No books available.</li>
+<div #listContainer>
+  <h1>Books</h1>
+  @if (books(); as books) {
+  <ul class="book-list">
+    @for (book of books.docs; track book.key) {
+    <li>
+      @if (!isLoading()) {
+      <bf-book-list-item [book]="book"></bf-book-list-item>
+      } @else {
+      <bf-book-skeleton></bf-book-skeleton>
+      }
+    </li>
+    } @empty {
+    <li>No books available.</li>
+    }
+  </ul>
+  @if (totalPages(); as totalPages;) {
+  <div class="pagination">
+    <button [disabled]="page() === 1" (click)="selectPage(1)">&lt;&lt;</button>
+    <button [disabled]="page() === 1" (click)="selectPage(page() - 1)">
+      &lt;
+    </button>
+    @for (page of visiblePages(); track $index) {
+    <button [disabled]="page === currentPage()" (click)="selectPage(page)">
+      {{ page }}
+    </button>
+    }
+    <button [disabled]="page() === totalPages" (click)="selectPage(page() + 1)">
+      >
+    </button>
+    <button [disabled]="page() === totalPages" (click)="selectPage(totalPages)">
+      >>
+    </button>
+  </div>
+  } } @else {
+  <div class="loader">
+    <p class="loader__spinner"></p>
+  </div>
   }
-</ul>
-@if (totalPages(); as totalPages;) {
-<div class="pagination">
-  <button [disabled]="page() === 1" (click)="selectPage(1)">&lt;&lt;</button>
-  <button [disabled]="page() === 1" (click)="selectPage(page() - 1)">
-    &lt;
-  </button>
-  @for (page of visiblePages(); track $index) {
-  <button [disabled]="page === currentPage()" (click)="selectPage(page)">
-    {{ page }}
-  </button>
-  }
-  <button [disabled]="page() === totalPages" (click)="selectPage(page() + 1)">
-    >
-  </button>
-  <button [disabled]="page() === totalPages" (click)="selectPage(totalPages)">
-    >>
-  </button>
 </div>
-} } @else {
-<div class="loader">
-  <p class="loader__spinner"></p>
-</div>
-}

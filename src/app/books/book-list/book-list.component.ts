@@ -2,9 +2,11 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
   OnInit,
   signal,
+  viewChild,
 } from '@angular/core';
 import { BookStoreService } from '../../shared/book-store.service';
 import { BookListItemComponent } from '../book-list-item/book-list-item.component';
@@ -12,17 +14,25 @@ import { Subject } from 'rxjs';
 import { BookList } from '../../shared/book-list';
 import { AsyncPipe, NgIf } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { BookSkeletonComponent } from '../book-skeleton/book-skeleton.component';
 
 @Component({
   selector: 'bf-book-list',
   templateUrl: './book-list.component.html',
   styleUrl: './book-list.component.scss',
   standalone: true,
-  imports: [BookListItemComponent, AsyncPipe, ReactiveFormsModule, NgIf],
+  imports: [
+    BookListItemComponent,
+    BookSkeletonComponent,
+    AsyncPipe,
+    ReactiveFormsModule,
+    NgIf,
+  ],
 })
 export class BookListComponent implements OnInit {
+  isLoading = signal(false);
   private bookStoreService = inject(BookStoreService);
-
+  listContainer = viewChild<ElementRef>('listContainer');
   private specialQuery = '';
   private language = '';
   sortOptions = [
@@ -94,10 +104,10 @@ export class BookListComponent implements OnInit {
   }
 
   selectPage(page: number): void {
+    this.isLoading.set(true);
     this.page.set(page);
     this.currentPage.set(page);
     this.triggerSearch();
-    scrollTo(0, 0);
   }
 
   onSubmit() {
@@ -119,29 +129,16 @@ export class BookListComponent implements OnInit {
         this.specialQuery = `language%3A${this.language}`;
       }
     }
-    if (!this.specialQuery) {
-      this.specialQuery = '*';
-    }
     this.page.set(1);
+    this.currentPage.set(1);
+    this.isLoading.set(true);
     this.triggerSearch();
-    this.bookStoreService.searchBooks(
-      this.specialQuery,
-      this.searchForm.value.title?.trim() ?? '',
-      this.searchForm.value.author?.trim() ?? '',
-      this.searchForm.value.isbn?.trim() ?? '',
-      this.searchForm.value.subject?.trim() ?? '',
-      this.searchForm.value.publisher?.trim() ?? '',
-      this.searchForm.value.person?.trim() ?? '',
-      this.searchForm.value.place?.trim() ?? '',
-      this.searchForm.value.sort ?? this.sortOptions[0],
-      this.searchForm.value.limit ?? this.limitOptions[0],
-      this.page()
-    );
   }
   private triggerSearch(): void {
     if (!this.specialQuery) {
       this.specialQuery = '*';
     }
+    this.listContainer()?.nativeElement.scrollIntoView();
     this.bookStoreService
       .searchBooks(
         this.specialQuery,
@@ -157,7 +154,10 @@ export class BookListComponent implements OnInit {
         this.page()
       )
       .subscribe({
-        next: (books) => this.books.set(books),
+        next: (books) => {
+          this.books.set(books);
+          this.isLoading.set(false);
+        },
         error: (err) => {
           console.error('Error searching for books:', err);
         },
