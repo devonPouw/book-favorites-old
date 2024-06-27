@@ -2,7 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 import { BookList } from './book-list';
-
+import { BookDetails } from './book-details';
+import { Author } from './author';
+import { BookFilters } from './book-filters';
 @Injectable({
   providedIn: 'root',
 })
@@ -20,22 +22,13 @@ export class BookStoreService {
         })
       );
   }
-  searchBooks(
-    specialQuery: string,
-    title: string,
-    author: string,
-    isbn: string,
-    subject: string,
-    publisher: string,
-    person: string,
-    place: string,
-    sort: string,
-    limit: number,
-    page: number
-  ): Observable<BookList> {
+  searchBooks(bookFilter: BookFilters): Observable<BookList> {
     return this.http
       .get<BookList>(
-        `${this.apiUrl}/search.json?q=${specialQuery}&title='${title}'&author='${author}'&isbn=${isbn}&subject='${subject}'&publisher='${publisher}'&person='${person}'&place='${place}'&sort=${sort}&limit=${limit}&page=${page}`
+        `${this.apiUrl}/search.json?q=${bookFilter.specialQuery}&title='${bookFilter.title}'&author='${bookFilter.author}
+        '&isbn=${bookFilter.isbn}&subject='${bookFilter.subject}'&publisher='${bookFilter.publisher}'
+        &person='${bookFilter.person}'&place='${bookFilter.place}'
+        &sort=${bookFilter.sort}&limit=${bookFilter.limit}&page=${bookFilter.page}`
       )
       .pipe(
         catchError((err) => {

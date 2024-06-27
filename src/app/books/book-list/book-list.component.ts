@@ -30,9 +30,10 @@ import { BookSkeletonComponent } from '../book-skeleton/book-skeleton.component'
   ],
 })
 export class BookListComponent implements OnInit {
-  isLoading = signal(false);
   private bookStoreService = inject(BookStoreService);
+
   listContainer = viewChild<ElementRef>('listContainer');
+
   private specialQuery = '';
   private language = '';
   sortOptions = [
@@ -63,24 +64,28 @@ export class BookListComponent implements OnInit {
     sort: new FormControl(this.sortOptions[0]),
     limit: new FormControl(this.limitOptions[0]),
   });
+
   searchTrigger$ = new Subject<void>();
+  isLoading = signal(false);
   page = signal(1);
   books = signal<BookList | null>(null);
+
   totalPages = computed(() => {
     const currentBooks = this.books();
-    if (!currentBooks) return 0;
     const limit = this.searchForm.get('limit')?.value ?? 10;
-    return Math.ceil(currentBooks.numFound / limit);
+    return currentBooks ? Math.ceil(currentBooks.numFound / limit) : 0;
   });
+
   visiblePages = computed(() => {
     const totalPages = this.totalPages();
-    const length = Math.min(totalPages, 5);
+    const length = Math.min(totalPages, 10);
     const startIndex = Math.max(
       Math.min(this.page() - Math.ceil(length / 2), totalPages - length),
       0
     );
     return Array.from({ length }, (_, index) => index + startIndex + 1);
   });
+
   constructor() {
     effect(() => {
       this.bookStoreService.getInitial().subscribe({
@@ -91,6 +96,7 @@ export class BookListComponent implements OnInit {
       });
     });
   }
+
   ngOnInit() {
     this.searchForm.get('publishYear1')?.valueChanges.subscribe((value) => {
       if (value) {
@@ -134,35 +140,36 @@ export class BookListComponent implements OnInit {
     this.isLoading.set(true);
     this.triggerSearch();
   }
+
   private triggerSearch(): void {
     if (!this.specialQuery) {
       this.specialQuery = '*';
     }
     this.listContainer()?.nativeElement.scrollIntoView();
-    this.bookStoreService
-      .searchBooks(
-        this.specialQuery,
-        this.searchForm.value.title?.trim() ?? '',
-        this.searchForm.value.author?.trim() ?? '',
-        this.searchForm.value.isbn?.trim() ?? '',
-        this.searchForm.value.subject?.trim() ?? '',
-        this.searchForm.value.publisher?.trim() ?? '',
-        this.searchForm.value.person?.trim() ?? '',
-        this.searchForm.value.place?.trim() ?? '',
-        this.searchForm.value.sort ?? this.sortOptions[0],
-        this.searchForm.value.limit ?? this.limitOptions[0],
-        this.page()
-      )
-      .subscribe({
-        next: (books) => {
-          this.books.set(books);
-          this.isLoading.set(false);
-        },
-        error: (err) => {
-          console.error('Error searching for books:', err);
-        },
-      });
+    const bookFilter = {
+      specialQuery: this.specialQuery,
+      title: this.searchForm.value.title?.trim() ?? '',
+      author: this.searchForm.value.author?.trim() ?? '',
+      isbn: this.searchForm.value.isbn?.trim() ?? '',
+      subject: this.searchForm.value.subject?.trim() ?? '',
+      publisher: this.searchForm.value.publisher?.trim() ?? '',
+      person: this.searchForm.value.person?.trim() ?? '',
+      place: this.searchForm.value.place?.trim() ?? '',
+      sort: this.searchForm.value.sort ?? this.sortOptions[0],
+      limit: this.searchForm.value.limit ?? this.limitOptions[0],
+      page: this.page(),
+    };
+    this.bookStoreService.searchBooks(bookFilter).subscribe({
+      next: (books) => {
+        this.books.set(books);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error searching for books:', err);
+      },
+    });
   }
+
   clearForm() {
     this.searchForm.reset();
     this.searchForm.get('sort')?.setValue(this.sortOptions[0]);
