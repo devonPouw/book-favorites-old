@@ -4,7 +4,7 @@ import { Observable, catchError, of } from 'rxjs';
 import { BookList } from './book-list';
 import { BookDetails } from './book-details';
 import { Author } from './author';
-import { BookFilters } from './book-filters';
+import { BookFilter } from './book-filter';
 @Injectable({
   providedIn: 'root',
 })
@@ -22,7 +22,7 @@ export class BookStoreService {
         })
       );
   }
-  searchBooks(bookFilter: BookFilters): Observable<BookList> {
+  searchBooks(bookFilter: BookFilter): Observable<BookList> {
     return this.http
       .get<BookList>(
         `${this.apiUrl}/search.json?q=${bookFilter.specialQuery}&title='${bookFilter.title}'&author='${bookFilter.author}
@@ -36,5 +36,11 @@ export class BookStoreService {
           return of({} as BookList);
         })
       );
+  }
+  getSingle(key: string): Observable<BookDetails> {
+    return this.http.get<BookDetails>(`${this.apiUrl}/works/${key}.json`);
+  }
+  getAuthors(authorKey: string): Observable<Author> {
+    return this.http.get<Author>(`${this.apiUrl}${authorKey}.json`);
   }
 }

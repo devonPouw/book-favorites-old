@@ -1,1 +1,46 @@
-<p>book-details works!</p>
+@if (book$ | async; as book) {
+<div class="details">
+  <h1>{{ book.title }}</h1>
+  @if (book.description) {
+  <p role="doc-subtitle">{{ book.description }}</p>
+  }
+  <div class="header">
+    <div>
+      <h2>Authors</h2>
+      @if(authors$ | async; as authors) {
+      <ul>
+        @for (author of authors; track $index) {
+        <li>{{ author.name }}</li>
+        }@empty{
+        <p>No authors found</p>
+        }
+      </ul>
+      } @else {
+      <p>Loading authors...</p>
+      }
+    </div>
+  </div>
+  <div class="header">
+    <h2>Covers</h2>
+    @if(book.covers) {
+    <ul style="display: flex; flex-wrap: wrap">
+      @for (cover of book.covers; track $index) {
+      <li>
+        <img
+          [src]="'https://covers.openlibrary.org/b/id/' + cover + '-M.jpg'"
+          alt="Cover"
+          width="200"
+          height="250"
+        />
+      </li>
+      } @empty {
+      <p>No covers found</p>
+      }
+    </ul>
+    } @else {
+    <p>Loading covers...</p>
+    }
+  </div>
+  <a class="button arrow-left" routerLink="..">Back to list</a>
+</div>
+}

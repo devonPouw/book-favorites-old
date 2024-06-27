@@ -1,5 +1,5 @@
 @if(book(); as book) {
-<a class="list-item">
+<a [routerLink]="'.' + book.key.substring(6)" class="list-item">
   <h2>{{ book.title }}</h2>
   @if(book.ratings_average){
   <div style="display: flex; flex-direction: row">

@@ -1,11 +1,13 @@
 import { Component, input } from '@angular/core';
 import { Book } from '../../shared/book';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'bf-book-list-item',
   templateUrl: './book-list-item.component.html',
   styleUrl: './book-list-item.component.scss',
   standalone: true,
+  imports: [RouterLink],
 })
 export class BookListItemComponent {
   book = input.required<Book>();
