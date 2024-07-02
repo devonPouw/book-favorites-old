@@ -4,8 +4,8 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
 
-import { BookStoreService } from '../../shared/book-store.service';
-import { Author } from '../../shared/author';
+import { BookStoreService } from '../services/book-store.service';
+import { Author } from '../models/author';
 
 @Component({
   selector: 'bf-book-details',

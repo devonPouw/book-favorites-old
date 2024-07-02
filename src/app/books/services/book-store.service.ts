@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
-import { BookList } from './book-list';
-import { BookDetails } from './book-details';
-import { Author } from './author';
-import { BookFilter } from './book-filter';
+import { BookList } from '../models/book-list';
+import { BookDetails } from '../models/book-details';
+import { Author } from '../models/author';
+import { BookFilter } from '../models/book-filter';
 @Injectable({
   providedIn: 'root',
 })
