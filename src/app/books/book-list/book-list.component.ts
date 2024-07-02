@@ -8,13 +8,17 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { BookStoreService } from '../../shared/book-store.service';
+import { BookStoreService } from '../services/book-store.service';
 import { BookListItemComponent } from '../book-list-item/book-list-item.component';
 import { Subject } from 'rxjs';
-import { BookList } from '../../shared/book-list';
+import { BookList } from '../models/book-list';
 import { AsyncPipe, NgIf } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { BookSkeletonComponent } from '../book-skeleton/book-skeleton.component';
+import {
+  isbnValidator,
+  IsbnValidatorDirective,
+} from '../directives/isbn-validator.directive';
 
 @Component({
   selector: 'bf-book-list',
@@ -27,6 +31,7 @@ import { BookSkeletonComponent } from '../book-skeleton/book-skeleton.component'
     AsyncPipe,
     ReactiveFormsModule,
     NgIf,
+    IsbnValidatorDirective,
   ],
 })
 export class BookListComponent implements OnInit {
@@ -50,7 +55,7 @@ export class BookListComponent implements OnInit {
   searchForm = new FormGroup({
     title: new FormControl(''),
     author: new FormControl(''),
-    isbn: new FormControl(''),
+    isbn: new FormControl('', [isbnValidator()]),
     publishYear1: new FormControl(''),
     publishYear2: new FormControl({
       value: '',
@@ -64,6 +69,14 @@ export class BookListComponent implements OnInit {
     sort: new FormControl(this.sortOptions[0]),
     limit: new FormControl(this.limitOptions[0]),
   });
+
+  get isbn() {
+    return this.searchForm.get('isbn');
+  }
+
+  invalidIsbn() {
+    return this.isbn?.invalid && this.isbn?.value;
+  }
 
   searchTrigger$ = new Subject<void>();
   isLoading = signal(false);

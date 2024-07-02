@@ -26,7 +26,15 @@
 
   <label for="isbn">ISBN</label>
   <div>
-    <input type="number" placeholder="1234567890" formControlName="isbn" />
+    <input
+      type="text"
+      placeholder="1234567890"
+      formControlName="isbn"
+      bfIsbnValidator
+    />
+    <div *ngIf="invalidIsbn()">
+      Invalid ISBN format. Please enter a valid 10-digit or 13-digit ISBN.
+    </div>
   </div>
   <label for="publishYear1">Year published</label>
   <div style="display: flex">
@@ -57,7 +65,7 @@
     <input type="text" placeholder="Harry Potter" formControlName="person" />
   </div>
   <button type="button" (click)="clearForm()">Reset fields</button>
-  <button type="submit">Search</button>
+  <button type="submit" [disabled]="invalidIsbn()">Search</button>
 </form>
 
 <div #listContainer>
