@@ -1,4 +1,30 @@
-/* Basic Style definitions */
+@use "@angular/material" as mat;
+
+$theme: mat.define-theme(
+  (
+    color: (
+      theme-type: dark,
+      primary: mat.$violet-palette,
+    ),
+    typography: (
+      brand-family: "Comic Sans",
+      bold-weight: 900,
+    ),
+  )
+);
+body {
+  @include mat.all-component-themes($theme);
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  margin: 0;
+  padding: 30px;
+  height: 100%;
+}
+html {
+  height: 100%;
+}
+
+@include mat.core();
+@include mat.color-variants-backwards-compatibility($theme);
 * {
   font-family: "Lato", "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
@@ -41,48 +67,6 @@ ul {
 
 img {
   object-fit: contain;
-}
-
-button,
-a.button {
-  box-sizing: inherit;
-  overflow: visible;
-  cursor: pointer;
-  display: inline-block;
-  min-height: 1em;
-  border: none;
-  vertical-align: initial;
-  background: #e0e1e2 none;
-  color: rgba(0, 0, 0, 0.6);
-  font-family: Lato, Helvetica Neue, Arial, Helvetica, sans-serif;
-  margin: 0.25em 0.25em 0 0;
-  padding: 0.8em 1.5em;
-  text-transform: none;
-  text-shadow: none;
-  font-weight: 700;
-  line-height: 1em;
-  font-style: normal;
-  text-align: center;
-  text-decoration: none;
-  border-radius: 0.3rem;
-  user-select: none;
-  transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease,
-    box-shadow 0.1s ease, background 0.1s ease;
-  -webkit-tap-highlight-color: transparent;
-  box-shadow: inset 0 0 0 1px transparent, inset 0 0 0 0 rgba(34, 36, 38, 0.15);
-  font-size: 0.8rem;
-}
-button:hover,
-a.button:hover {
-  background-color: #cacbcd;
-}
-button:disabled,
-a.button:disabled,
-button:disabled:hover,
-a.button:disabled:hover {
-  cursor: not-allowed !important;
-  background-color: rgba(0, 0, 0, 0.05) !important;
-  color: #888888 !important;
 }
 
 /* Navbar Style */
@@ -311,9 +295,7 @@ form input:disabled,
 form textarea:disabled {
   background-color: rgba(0, 0, 0, 0.05);
 }
-form button.clear {
-  margin-left: 10px;
-}
+
 form fieldset {
   width: 100%;
   border: none;
@@ -321,26 +303,6 @@ form fieldset {
   padding: 0;
 }
 
-form > button[type="submit"] {
-  background-color: #287e2b;
-  color: #fff;
-}
-form > button[type="submit"]:hover {
-  background-color: #096c0d;
-}
-
-form > button {
-  background-color: #cb350f;
-  color: #fff;
-}
-form > button:hover {
-  background-color: #b41414;
-}
-
-body {
-  margin: 20px;
-  min-width: 320px;
-}
 /* media screen */
 @media only screen and (max-width: 700px) {
   nav {
@@ -368,9 +330,6 @@ body {
     margin: 0;
     gap: 0.5rem;
     min-width: 200px;
-  }
-  nav .actions button {
-    margin: 0;
   }
 }
 @media only screen and (max-width: 500px) {
