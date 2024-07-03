@@ -1,71 +1,193 @@
 <form [formGroup]="searchForm" (ngSubmit)="onSubmit()">
-  <label for="title">Title</label>
-  <div style="display: flex; justify-content: space-between">
-    <input
-      type="text"
-      placeholder="Lord of the Rings"
-      formControlName="title"
-    />
-    <div>
-      <select formControlName="sort">
-        @for (item of sortOptions; track $index) {
-        <option [value]="item">{{ item }}</option>
+  <div style="width: 100%; display: flex; justify-content: space-between">
+    <button type="button" mat-button (click)="clearForm()">Reset fields</button>
+    <mat-form-field>
+      <mat-label>Sort by</mat-label>
+      <mat-select formControlName="sort">
+        @for (option of sortOptions; track $index) {
+        <mat-option [value]="option.value">{{ option.viewValue }}</mat-option>
         }
-      </select>
-      <select formControlName="limit">
-        @for (item of limitOptions; track $index) {
-        <option [value]="item">{{ item }}</option>
-        }
-      </select>
-    </div>
+      </mat-select>
+    </mat-form-field>
   </div>
-  <label for="author">Author</label>
-  <div>
-    <input type="text" placeholder="Roald Dahl" formControlName="author" />
+  <div
+    style="
+      display: flex;
+      flex-wrap: wrap;
+      @media screen and (max-width: 700px) {
+        justify-content: center;
+      }
+    "
+  >
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label>Book title</mat-label>
+        <input
+          formControlName="title"
+          matInput
+          placeholder="Lord of the rings"
+        />
+        <button
+          matSuffix
+          type="button"
+          class="clear-button"
+          mat-mini-fab
+          (click)="clearField('title')"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label>Author</mat-label>
+        <input formControlName="author" matInput placeholder="Roald Dahl" />
+        <button
+          matSuffix
+          type="button"
+          class="clear-button"
+          mat-mini-fab
+          (click)="clearField('author')"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="outline" hintLabel="ISBN-10 and ISBN-13">
+        <mat-label>ISBN</mat-label>
+        <input
+          formControlName="isbn"
+          matInput
+          #input
+          maxlength="13"
+          placeholder="1234567890"
+          bfIsbnValidator
+        />
+        <button
+          matSuffix
+          type="button"
+          class="clear-button"
+          mat-mini-fab
+          (click)="clearField('isbn')"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+        <mat-hint align="end"
+          >@if(isSearchButtonDisabled() && isbn){<em>ISBN is invalid</em>
+          @if(isbn.value && isbn.value.length < 10) { {{ isbn.value.length }}/10
+          } @else{ {{ isbn.value?.length }}/13 }}
+        </mat-hint>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label>Year published</mat-label>
+        <input formControlName="publishYear1" matInput placeholder="0" />
+        <button
+          matSuffix
+          type="button"
+          class="clear-button"
+          mat-mini-fab
+          (click)="clearField('publishYear1')"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+        <mat-hint> Year published from </mat-hint>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label>Year published</mat-label>
+        <input formControlName="publishYear2" matInput placeholder="2024" />
+        <button
+          matSuffix
+          type="button"
+          [disabled]="searchForm.get('publishYear2')?.disabled"
+          class="clear-button"
+          mat-mini-fab
+          (click)="clearField('publishYear2')"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+        <mat-hint> Year published to </mat-hint>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label>Language</mat-label>
+        <input formControlName="language" matInput placeholder="eng" />
+        <button
+          matSuffix
+          type="button"
+          class="clear-button"
+          mat-mini-fab
+          (click)="clearField('language')"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+        <mat-hint
+          >enter the first three letters of the language; japan uses jpn; mul
+          for multiple
+        </mat-hint>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label>Subject</mat-label>
+        <input formControlName="subject" matInput placeholder="fantasy" />
+        <button
+          matSuffix
+          type="button"
+          class="clear-button"
+          mat-mini-fab
+          (click)="clearField('subject')"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label>Publisher</mat-label>
+        <input formControlName="publisher" matInput placeholder="Malmberg" />
+        <button
+          matSuffix
+          type="button"
+          class="clear-button"
+          mat-mini-fab
+          (click)="clearField('publisher')"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label>Character</mat-label>
+        <input formControlName="person" matInput placeholder="Harry Potter" />
+        <button
+          matSuffix
+          type="button"
+          class="clear-button"
+          mat-mini-fab
+          (click)="clearField('person')"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-form-field>
+    </p>
   </div>
 
-  <label for="isbn">ISBN</label>
-  <div>
-    <input
-      type="text"
-      placeholder="1234567890"
-      formControlName="isbn"
-      bfIsbnValidator
-    />
-    <div *ngIf="invalidIsbn()">
-      Invalid ISBN format. Please enter a valid 10-digit or 13-digit ISBN.
-    </div>
+  <div
+    style="width: fit-content"
+    matTooltip="Filled fields need to be valid."
+    [matTooltipDisabled]="!isSearchButtonDisabled()"
+  >
+    <button type="submit" mat-flat-button [disabled]="isSearchButtonDisabled()">
+      Search
+    </button>
   </div>
-  <label for="publishYear1">Year published</label>
-  <div style="display: flex">
-    <input
-      style="margin-right: 5px"
-      type="string"
-      placeholder="2000"
-      formControlName="publishYear1"
-    />
-
-    <input type="string" placeholder="2020" formControlName="publishYear2" />
-  </div>
-
-  <label for="language">Language</label>
-  <div>
-    <input type="text" placeholder="eng" formControlName="language" />
-  </div>
-  <label for="subject">Subject</label>
-  <div>
-    <input type="text" placeholder="fantasy" formControlName="subject" />
-  </div>
-  <label for="publisher">Publisher</label>
-  <div>
-    <input type="text" placeholder="Malmberg" formControlName="publisher" />
-  </div>
-  <label for="person">Character</label>
-  <div>
-    <input type="text" placeholder="Harry Potter" formControlName="person" />
-  </div>
-  <button type="button" (click)="clearForm()">Reset fields</button>
-  <button type="submit" [disabled]="invalidIsbn()">Search</button>
 </form>
 
 <div #listContainer>
@@ -85,26 +207,23 @@
     }
   </ul>
   @if (totalPages(); as totalPages;) {
-  <div class="pagination">
-    <button [disabled]="page() === 1" (click)="selectPage(1)">&lt;&lt;</button>
-    <button [disabled]="page() === 1" (click)="selectPage(page() - 1)">
-      &lt;
-    </button>
-    @for (page of visiblePages(); track $index) {
-    <button [disabled]="page === currentPage()" (click)="selectPage(page)">
-      {{ page }}
-    </button>
-    }
-    <button [disabled]="page() === totalPages" (click)="selectPage(page() + 1)">
-      >
-    </button>
-    <button [disabled]="page() === totalPages" (click)="selectPage(totalPages)">
-      >>
-    </button>
+  <div style="width: 100%; display: flex; justify-content: center">
+    <mat-paginator
+      #paginator
+      class="demo-paginator"
+      (page)="handlePageEvent($event)"
+      [length]="books.numFound"
+      [pageSize]="limit"
+      [showFirstLastButtons]="true"
+      [pageSizeOptions]="pageSizeOptions"
+      [pageIndex]="page() - 1"
+      aria-label="Select page"
+    >
+    </mat-paginator>
   </div>
   } } @else {
   <div class="loader">
-    <p class="loader__spinner"></p>
+    <mat-spinner></mat-spinner>
   </div>
   }
 </div>

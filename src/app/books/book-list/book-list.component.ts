@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -19,6 +20,15 @@ import {
   isbnValidator,
   IsbnValidatorDirective,
 } from '../directives/isbn-validator.directive';
+import { MatButtonModule } from '@angular/material/button';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { Select } from '../../shared/models/select';
 
 @Component({
   selector: 'bf-book-list',
@@ -32,7 +42,17 @@ import {
     ReactiveFormsModule,
     NgIf,
     IsbnValidatorDirective,
+    MatButtonModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatSelectModule,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookListComponent implements OnInit {
   private bookStoreService = inject(BookStoreService);
@@ -41,16 +61,17 @@ export class BookListComponent implements OnInit {
 
   private specialQuery = '';
   private language = '';
-  sortOptions = [
-    'rating desc',
-    'rating asc',
-    'old',
-    'new',
-    'title',
-    'editions',
-    'scans',
+  public sortOptions: Select[] = [
+    { value: 'title', viewValue: 'Title (A-Z)' },
+    { value: 'rating desc', viewValue: 'Rating (high to low)' },
+    { value: 'rating asc', viewValue: 'Rating (low to high)' },
+    { value: 'new', viewValue: 'Year (new to old)' },
+    { value: 'old', viewValue: 'Year (old to new)' },
+    { value: 'editions', viewValue: 'Editions' },
+    { value: 'scans', viewValue: 'Scans' },
   ];
-  limitOptions = [10, 20, 50];
+
+  pageSizeOptions = [5, 10, 25, 100];
   currentPage = signal(1);
   searchForm = new FormGroup({
     title: new FormControl(''),
@@ -66,17 +87,30 @@ export class BookListComponent implements OnInit {
     publisher: new FormControl(''),
     person: new FormControl(''),
     place: new FormControl(''),
-    sort: new FormControl(this.sortOptions[0]),
-    limit: new FormControl(this.limitOptions[0]),
+    sort: new FormControl(this.sortOptions[0].value),
+    limit: new FormControl(this.pageSizeOptions[0]),
   });
 
   get isbn() {
     return this.searchForm.get('isbn');
   }
 
-  invalidIsbn() {
-    return this.isbn?.invalid && this.isbn?.value;
+  get limit() {
+    return this.searchForm.get('limit');
   }
+  pageEvent: PageEvent = new PageEvent();
+
+  handlePageEvent(e: PageEvent) {
+    this.isLoading.set(true);
+    this.pageEvent = e;
+    this.limit?.setValue(e.pageSize);
+    this.page.set(e.pageIndex + 1);
+    this.triggerSearch();
+  }
+
+  isSearchButtonDisabled = () => {
+    return this.isbn?.invalid && !!this.isbn?.value;
+  };
 
   searchTrigger$ = new Subject<void>();
   isLoading = signal(false);
@@ -87,16 +121,6 @@ export class BookListComponent implements OnInit {
     const currentBooks = this.books();
     const limit = this.searchForm.get('limit')?.value ?? 10;
     return currentBooks ? Math.ceil(currentBooks.numFound / limit) : 0;
-  });
-
-  visiblePages = computed(() => {
-    const totalPages = this.totalPages();
-    const length = Math.min(totalPages, 10);
-    const startIndex = Math.max(
-      Math.min(this.page() - Math.ceil(length / 2), totalPages - length),
-      0
-    );
-    return Array.from({ length }, (_, index) => index + startIndex + 1);
   });
 
   constructor() {
@@ -120,13 +144,6 @@ export class BookListComponent implements OnInit {
       }
       this.searchTrigger$.next();
     });
-  }
-
-  selectPage(page: number): void {
-    this.isLoading.set(true);
-    this.page.set(page);
-    this.currentPage.set(page);
-    this.triggerSearch();
   }
 
   onSubmit() {
@@ -168,8 +185,8 @@ export class BookListComponent implements OnInit {
       publisher: this.searchForm.value.publisher?.trim() ?? '',
       person: this.searchForm.value.person?.trim() ?? '',
       place: this.searchForm.value.place?.trim() ?? '',
-      sort: this.searchForm.value.sort ?? this.sortOptions[0],
-      limit: this.searchForm.value.limit ?? this.limitOptions[0],
+      sort: this.searchForm.get('sort')?.value ?? 'title',
+      limit: this.searchForm.value.limit ?? this.pageSizeOptions[0],
       page: this.page(),
     };
     this.bookStoreService.searchBooks(bookFilter).subscribe({
@@ -185,8 +202,14 @@ export class BookListComponent implements OnInit {
 
   clearForm() {
     this.searchForm.reset();
-    this.searchForm.get('sort')?.setValue(this.sortOptions[0]);
-    this.searchForm.get('limit')?.setValue(this.limitOptions[0]);
+    this.searchForm.get('sort')?.setValue(this.sortOptions[0].value);
+    this.searchForm.get('limit')?.setValue(this.pageSizeOptions[0]);
     this.searchForm.get('publishYear2')?.disable();
+  }
+  clearField(field: string) {
+    this.searchForm.get(field)?.reset();
+    if (field === 'publishYear1') {
+      this.searchForm.get('publishYear2')?.disable();
+    }
   }
 }

@@ -14,7 +14,7 @@ export class BookStoreService {
 
   getInitial(): Observable<BookList> {
     return this.http
-      .get<BookList>(`${this.apiUrl}/search.json?q=*&limit=10&sort=rating`)
+      .get<BookList>(`${this.apiUrl}/search.json?q=*&limit=5&sort=rating`)
       .pipe(
         catchError((err) => {
           console.error(err);
