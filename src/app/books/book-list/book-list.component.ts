@@ -14,7 +14,12 @@ import { BookListItemComponent } from '../book-list-item/book-list-item.componen
 import { Subject } from 'rxjs';
 import { BookList } from '../models/book-list';
 import { AsyncPipe, NgIf } from '@angular/common';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { BookSkeletonComponent } from '../book-skeleton/book-skeleton.component';
 import {
   isbnValidator,
@@ -82,7 +87,7 @@ export class BookListComponent implements OnInit {
       value: '',
       disabled: true,
     }),
-    language: new FormControl(''),
+    language: new FormControl('', [Validators.minLength(3)]),
     subject: new FormControl(''),
     publisher: new FormControl(''),
     person: new FormControl(''),
@@ -98,6 +103,31 @@ export class BookListComponent implements OnInit {
   get limit() {
     return this.searchForm.get('limit');
   }
+  get title() {
+    return this.searchForm.get('title');
+  }
+  get author() {
+    return this.searchForm.get('author');
+  }
+  get publishYear1() {
+    return this.searchForm.get('publishYear1');
+  }
+  get publishYear2() {
+    return this.searchForm.get('publishYear2');
+  }
+  get place() {
+    return this.searchForm.get('place');
+  }
+  get subject() {
+    return this.searchForm.get('subject');
+  }
+  get publisher() {
+    return this.searchForm.get('publisher');
+  }
+  get person() {
+    return this.searchForm.get('person');
+  }
+
   pageEvent: PageEvent = new PageEvent();
 
   handlePageEvent(e: PageEvent) {

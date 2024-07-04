@@ -10,18 +10,18 @@
       </mat-select>
     </mat-form-field>
   </div>
-  <div
-    style="
-      display: flex;
-      flex-wrap: wrap;
-      @media screen and (max-width: 700px) {
-        justify-content: center;
-      }
-    "
-  >
+  <div class="search-fields">
     <p>
       <mat-form-field appearance="outline">
-        <mat-label>Book title</mat-label>
+        <mat-label
+          >Book title
+          <mat-icon
+            matTooltip="
+              Will find any books with '{{ title?.value }}' in the title
+            "
+            matTooltipPosition="above"
+            fontIcon="info"
+        /></mat-label>
         <input
           formControlName="title"
           matInput
@@ -40,7 +40,14 @@
     </p>
     <p>
       <mat-form-field appearance="outline">
-        <mat-label>Author</mat-label>
+        <mat-label
+          >Author
+          <mat-icon
+            matTooltip="Will find any books written by '{{ author?.value }}'
+            (multiple allowed, separated by spaces or commas)"
+            matTooltipPosition="above"
+            fontIcon="info"
+        /></mat-label>
         <input formControlName="author" matInput placeholder="Roald Dahl" />
         <button
           matSuffix
@@ -54,8 +61,16 @@
       </mat-form-field>
     </p>
     <p>
-      <mat-form-field appearance="outline" hintLabel="ISBN-10 and ISBN-13">
-        <mat-label>ISBN</mat-label>
+      <mat-form-field appearance="outline">
+        <mat-label
+          >ISBN
+          <mat-icon
+            matTooltip="
+             10-digit and 13-digit ISBNs are allowed
+          "
+            matTooltipPosition="above"
+            fontIcon="info"
+        /></mat-label>
         <input
           formControlName="isbn"
           matInput
@@ -73,8 +88,9 @@
         >
           <mat-icon>delete</mat-icon>
         </button>
-        <mat-hint align="end"
-          >@if(isSearchButtonDisabled() && isbn){<em>ISBN is invalid</em>
+        <mat-hint
+          >@if(isSearchButtonDisabled() && isbn){
+          <span>ISBN is invalid</span>
           @if(isbn.value && isbn.value.length < 10) { {{ isbn.value.length }}/10
           } @else{ {{ isbn.value?.length }}/13 }}
         </mat-hint>
@@ -82,7 +98,16 @@
     </p>
     <p>
       <mat-form-field appearance="outline">
-        <mat-label>Year published</mat-label>
+        <mat-label
+          >Year published
+          <mat-icon
+            matTooltip="
+           Will find any book published in the year '{{ publishYear1?.value }}'.
+           * will find anything published before and up to the year'
+        "
+            matTooltipPosition="above"
+            fontIcon="info"
+        /></mat-label>
         <input formControlName="publishYear1" matInput placeholder="0" />
         <button
           matSuffix
@@ -93,12 +118,21 @@
         >
           <mat-icon>delete</mat-icon>
         </button>
-        <mat-hint> Year published from </mat-hint>
       </mat-form-field>
     </p>
     <p>
       <mat-form-field appearance="outline">
-        <mat-label>Year published</mat-label>
+        <mat-label
+          >Year published
+          <mat-icon
+            matTooltip="
+           When filled, will find any book published from '{{
+              publishYear1?.value
+            }}' to '{{ publishYear2?.value }}'
+        "
+            matTooltipPosition="above"
+            fontIcon="info"
+        /></mat-label>
         <input formControlName="publishYear2" matInput placeholder="2024" />
         <button
           matSuffix
@@ -110,13 +144,26 @@
         >
           <mat-icon>delete</mat-icon>
         </button>
-        <mat-hint> Year published to </mat-hint>
       </mat-form-field>
     </p>
     <p>
       <mat-form-field appearance="outline">
-        <mat-label>Language</mat-label>
-        <input formControlName="language" matInput placeholder="eng" />
+        <mat-label
+          >Language
+          <mat-icon
+            matTooltip="
+          enter the first three letters of the language; japan uses jpn; mul
+          for multiple; und for undetermined
+        "
+            matTooltipPosition="above"
+            fontIcon="info"
+        /></mat-label>
+        <input
+          formControlName="language"
+          maxlength="3"
+          matInput
+          placeholder="eng"
+        />
         <button
           matSuffix
           type="button"
@@ -126,15 +173,40 @@
         >
           <mat-icon>delete</mat-icon>
         </button>
-        <mat-hint
-          >enter the first three letters of the language; japan uses jpn; mul
-          for multiple
-        </mat-hint>
       </mat-form-field>
     </p>
     <p>
       <mat-form-field appearance="outline">
-        <mat-label>Subject</mat-label>
+        <mat-label
+          >Place
+          <mat-icon
+            matTooltip="Will find any books about '{{ place?.value }}'
+          (multiple allowed, separated by spaces or commas)"
+            matTooltipPosition="above"
+            fontIcon="info"
+        /></mat-label>
+        <input formControlName="place" matInput placeholder="Utrecht" />
+        <button
+          matSuffix
+          type="button"
+          class="clear-button"
+          mat-mini-fab
+          (click)="clearField('place')"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label
+          >Subject
+          <mat-icon
+            matTooltip="Will find any books about '{{ subject?.value }}'
+          (multiple allowed, separated by spaces or commas)"
+            matTooltipPosition="above"
+            fontIcon="info"
+        /></mat-label>
         <input formControlName="subject" matInput placeholder="fantasy" />
         <button
           matSuffix
@@ -149,7 +221,15 @@
     </p>
     <p>
       <mat-form-field appearance="outline">
-        <mat-label>Publisher</mat-label>
+        <mat-label
+          >Publisher
+          <mat-icon
+            matTooltip=" Will find any books by a publisher with '{{
+              publisher?.value
+            }}' in their name"
+            matTooltipPosition="above"
+            fontIcon="info"
+        /></mat-label>
         <input formControlName="publisher" matInput placeholder="Malmberg" />
         <button
           matSuffix
@@ -164,7 +244,14 @@
     </p>
     <p>
       <mat-form-field appearance="outline">
-        <mat-label>Character</mat-label>
+        <mat-label
+          >Character
+          <mat-icon
+            matTooltip="Will find any books with '{{ person?.value }}' in it
+        (multiple allowed, separated by spaces or commas)"
+            matTooltipPosition="above"
+            fontIcon="info"
+        /></mat-label>
         <input formControlName="person" matInput placeholder="Harry Potter" />
         <button
           matSuffix

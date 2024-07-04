@@ -3,8 +3,8 @@
 $theme: mat.define-theme(
   (
     color: (
-      theme-type: dark,
-      primary: mat.$violet-palette,
+      theme-type: light,
+      primary: mat.$azure-palette,
     ),
     typography: (
       brand-family: "Comic Sans",
@@ -25,9 +25,6 @@ html {
 
 @include mat.core();
 @include mat.color-variants-backwards-compatibility($theme);
-* {
-  font-family: "Lato", "Helvetica Neue", Arial, Helvetica, sans-serif;
-}
 
 h1,
 h2,

@@ -5,7 +5,19 @@
   height: 32px;
   width: 32px;
   margin-right: 6px;
+  opacity: 0.5;
 }
 .mat-mdc-form-field {
-  margin-right: 5px;
+  margin-left: 3px;
+  margin-right: 3px;
+}
+.search-fields {
+  display: flex;
+  flex-wrap: wrap;
+  @media screen and (max-width: 700px) {
+    justify-content: center;
+    .mat-mdc-form-field {
+      width: 300px;
+    }
+  }
 }
