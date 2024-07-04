@@ -82,11 +82,7 @@ export class BookListComponent implements OnInit {
     title: new FormControl(''),
     author: new FormControl(''),
     isbn: new FormControl('', [isbnValidator()]),
-    publishYear1: new FormControl(''),
-    publishYear2: new FormControl({
-      value: '',
-      disabled: true,
-    }),
+    publishYear: new FormControl(''),
     language: new FormControl('', [Validators.minLength(3)]),
     subject: new FormControl(''),
     publisher: new FormControl(''),
@@ -109,12 +105,10 @@ export class BookListComponent implements OnInit {
   get author() {
     return this.searchForm.get('author');
   }
-  get publishYear1() {
-    return this.searchForm.get('publishYear1');
+  get publishYear() {
+    return this.searchForm.get('publishYear');
   }
-  get publishYear2() {
-    return this.searchForm.get('publishYear2');
-  }
+
   get place() {
     return this.searchForm.get('place');
   }
@@ -165,25 +159,18 @@ export class BookListComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.searchForm.get('publishYear1')?.valueChanges.subscribe((value) => {
-      if (value) {
-        this.searchForm.get('publishYear2')?.enable();
-      } else {
-        this.searchForm.get('publishYear2')?.disable();
-        this.searchForm.get('publishYear2')?.reset();
-      }
-      this.searchTrigger$.next();
-    });
+    this.searchTrigger$.next();
   }
 
   onSubmit() {
-    if (
-      this.searchForm.value.publishYear1 &&
-      this.searchForm.value.publishYear2
-    ) {
-      this.specialQuery = `first_publish_year%3A[${this.searchForm.value.publishYear1.trim()} TO ${this.searchForm.value.publishYear2.trim()}]`;
-    } else if (this.searchForm.value.publishYear1) {
-      this.specialQuery = `first_publish_year%3A${this.searchForm.value.publishYear1.trim()}`;
+    if (this.searchForm.value.publishYear) {
+      console.log(this.searchForm.value.publishYear);
+      const publishYears = this.searchForm.value.publishYear.split('-');
+      if (publishYears.length === 2) {
+        this.specialQuery = `first_publish_year%3A[${publishYears[0]} TO ${publishYears[1]}]`;
+      } else {
+        this.specialQuery = `first_publish_year%3A${this.searchForm.value.publishYear}`;
+      }
     } else {
       this.specialQuery = '';
     }

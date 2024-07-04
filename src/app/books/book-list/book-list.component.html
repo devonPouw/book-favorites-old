@@ -25,7 +25,7 @@
         <input
           formControlName="title"
           matInput
-          placeholder="Lord of the rings"
+          placeholder="Lord of the Rings"
         />
         <button
           matSuffix
@@ -99,53 +99,28 @@
     <p>
       <mat-form-field appearance="outline">
         <mat-label
-          >Year published
+          >Publish year
           <mat-icon
             matTooltip="
-           Will find any book published in the year '{{ publishYear1?.value }}'.
-           * will find anything published before and up to the year'
+           Will find any book published in the year '{{ publishYear?.value }}'.
+           For range search, use e.g '2000-2010' or '*-2010 for anything published before and up to the year 2010'
         "
             matTooltipPosition="above"
             fontIcon="info"
         /></mat-label>
-        <input formControlName="publishYear1" matInput placeholder="0" />
+        <input formControlName="publishYear" matInput placeholder="2024" />
         <button
           matSuffix
           type="button"
           class="clear-button"
           mat-mini-fab
-          (click)="clearField('publishYear1')"
+          (click)="clearField('publishYear')"
         >
           <mat-icon>delete</mat-icon>
         </button>
       </mat-form-field>
     </p>
-    <p>
-      <mat-form-field appearance="outline">
-        <mat-label
-          >Year published
-          <mat-icon
-            matTooltip="
-           When filled, will find any book published from '{{
-              publishYear1?.value
-            }}' to '{{ publishYear2?.value }}'
-        "
-            matTooltipPosition="above"
-            fontIcon="info"
-        /></mat-label>
-        <input formControlName="publishYear2" matInput placeholder="2024" />
-        <button
-          matSuffix
-          type="button"
-          [disabled]="searchForm.get('publishYear2')?.disabled"
-          class="clear-button"
-          mat-mini-fab
-          (click)="clearField('publishYear2')"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-form-field>
-    </p>
+
     <p>
       <mat-form-field appearance="outline">
         <mat-label
@@ -207,7 +182,7 @@
             matTooltipPosition="above"
             fontIcon="info"
         /></mat-label>
-        <input formControlName="subject" matInput placeholder="fantasy" />
+        <input formControlName="subject" matInput placeholder="Fantasy" />
         <button
           matSuffix
           type="button"
