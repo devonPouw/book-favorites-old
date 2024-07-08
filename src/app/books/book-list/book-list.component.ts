@@ -34,6 +34,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { Select } from '../../shared/models/select';
+import { ClearFormFieldComponent } from '../../shared/clear-form-field/clear-form-field.component';
 
 @Component({
   selector: 'bf-book-list',
@@ -43,6 +44,7 @@ import { Select } from '../../shared/models/select';
   imports: [
     BookListItemComponent,
     BookSkeletonComponent,
+    ClearFormFieldComponent,
     AsyncPipe,
     ReactiveFormsModule,
     NgIf,
@@ -222,11 +224,5 @@ export class BookListComponent implements OnInit {
     this.searchForm.get('sort')?.setValue(this.sortOptions[0].value);
     this.searchForm.get('limit')?.setValue(this.pageSizeOptions[0]);
     this.searchForm.get('publishYear2')?.disable();
-  }
-  clearField(field: string) {
-    this.searchForm.get(field)?.reset();
-    if (field === 'publishYear1') {
-      this.searchForm.get('publishYear2')?.disable();
-    }
   }
 }

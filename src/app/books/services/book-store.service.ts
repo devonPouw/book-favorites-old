@@ -25,8 +25,8 @@ export class BookStoreService {
   searchBooks(bookFilter: BookFilter): Observable<BookList> {
     return this.http
       .get<BookList>(
-        `${this.apiUrl}/search.json?q=${bookFilter.specialQuery}&title='${bookFilter.title}'&author='${bookFilter.author}
-        '&isbn=${bookFilter.isbn}&subject='${bookFilter.subject}'&publisher='${bookFilter.publisher}'
+        `${this.apiUrl}/search.json?q=${bookFilter.specialQuery}&title='${bookFilter.title}'
+        &author='${bookFilter.author}'&isbn=${bookFilter.isbn}&subject='${bookFilter.subject}'&publisher='${bookFilter.publisher}'
         &person='${bookFilter.person}'&place='${bookFilter.place}'
         &sort=${bookFilter.sort}&limit=${bookFilter.limit}&page=${bookFilter.page}`
       )

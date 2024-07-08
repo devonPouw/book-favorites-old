@@ -1,6 +1,13 @@
 <form [formGroup]="searchForm" (ngSubmit)="onSubmit()">
   <div style="width: 100%; display: flex; justify-content: space-between">
-    <button type="button" mat-button (click)="clearForm()">Reset fields</button>
+    <button
+      class="reset-fields-button"
+      type="button"
+      mat-button
+      (click)="clearForm()"
+    >
+      Reset fields
+    </button>
     <mat-form-field>
       <mat-label>Sort by</mat-label>
       <mat-select formControlName="sort">
@@ -11,234 +18,192 @@
     </mat-form-field>
   </div>
   <div class="search-fields">
-    <p>
-      <mat-form-field appearance="outline">
-        <mat-label
-          >Book title
-          <mat-icon
-            matTooltip="
+    <mat-form-field appearance="outline">
+      <mat-label
+        >Book title
+        <mat-icon
+          (click)="titleTooltip.show()"
+          #titleTooltip="matTooltip"
+          matTooltip="
               Will find any books with '{{ title?.value }}' in the title
             "
-            matTooltipPosition="above"
-            fontIcon="info"
-        /></mat-label>
-        <input
-          formControlName="title"
-          matInput
-          placeholder="Lord of the Rings"
-        />
-        <button
-          matSuffix
-          type="button"
-          class="clear-button"
-          mat-mini-fab
-          (click)="clearField('title')"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field appearance="outline">
-        <mat-label
-          >Author
-          <mat-icon
-            matTooltip="Will find any books written by '{{ author?.value }}'
+          matTooltipPosition="above"
+          fontIcon="info"
+      /></mat-label>
+      <input formControlName="title" matInput placeholder="Lord of the Rings" />
+      <bf-clear-form-field
+        matSuffix
+        [control]="searchForm.get('title')!"
+      ></bf-clear-form-field>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label
+        >Author
+        <mat-icon
+          (click)="authorTooltip.show()"
+          #authorTooltip="matTooltip"
+          matTooltip="Will find any books written by '{{ author?.value }}'
             (multiple allowed, separated by spaces or commas)"
-            matTooltipPosition="above"
-            fontIcon="info"
-        /></mat-label>
-        <input formControlName="author" matInput placeholder="Roald Dahl" />
-        <button
-          matSuffix
-          type="button"
-          class="clear-button"
-          mat-mini-fab
-          (click)="clearField('author')"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field appearance="outline">
-        <mat-label
-          >ISBN
-          <mat-icon
-            matTooltip="
+          matTooltipPosition="above"
+          fontIcon="info"
+      /></mat-label>
+      <input formControlName="author" matInput placeholder="Roald Dahl" />
+      <bf-clear-form-field
+        matSuffix
+        [control]="searchForm.get('author')!"
+      ></bf-clear-form-field>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label
+        >ISBN
+        <mat-icon
+          (click)="isbnTooltip.show()"
+          #isbnTooltip="matTooltip"
+          matTooltip="
              10-digit and 13-digit ISBNs are allowed
           "
-            matTooltipPosition="above"
-            fontIcon="info"
-        /></mat-label>
-        <input
-          formControlName="isbn"
-          matInput
-          #input
-          maxlength="13"
-          placeholder="1234567890"
-          bfIsbnValidator
-        />
-        <button
-          matSuffix
-          type="button"
-          class="clear-button"
-          mat-mini-fab
-          (click)="clearField('isbn')"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-        <mat-hint
-          >@if(isSearchButtonDisabled() && isbn){
-          <span>ISBN is invalid</span>
-          @if(isbn.value && isbn.value.length < 10) { {{ isbn.value.length }}/10
-          } @else{ {{ isbn.value?.length }}/13 }}
-        </mat-hint>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field appearance="outline">
-        <mat-label
-          >Publish year
-          <mat-icon
-            matTooltip="
+          matTooltipPosition="above"
+          fontIcon="info"
+      /></mat-label>
+      <input
+        formControlName="isbn"
+        matInput
+        #input
+        maxlength="13"
+        placeholder="1234567890"
+        bfIsbnValidator
+      />
+      <bf-clear-form-field
+        matSuffix
+        [control]="searchForm.get('isbn')!"
+      ></bf-clear-form-field>
+      <mat-hint
+        >@if(isSearchButtonDisabled() && isbn){
+        <span>ISBN is invalid</span>
+        @if(isbn.value && isbn.value.length < 10) { {{ isbn.value.length }}/10 }
+        @else{ {{ isbn.value?.length }}/13 }}
+      </mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label
+        >Publish year
+        <mat-icon
+          (click)="publishYearTooltip.show()"
+          #publishYearTooltip="matTooltip"
+          matTooltip="
            Will find any book published in the year '{{ publishYear?.value }}'.
            For range search, use e.g '2000-2010' or '*-2010 for anything published before and up to the year 2010'
         "
-            matTooltipPosition="above"
-            fontIcon="info"
-        /></mat-label>
-        <input formControlName="publishYear" matInput placeholder="2024" />
-        <button
-          matSuffix
-          type="button"
-          class="clear-button"
-          mat-mini-fab
-          (click)="clearField('publishYear')"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-form-field>
-    </p>
+          matTooltipPosition="above"
+          fontIcon="info"
+      /></mat-label>
+      <input formControlName="publishYear" matInput placeholder="2024" />
+      <bf-clear-form-field
+        matSuffix
+        [control]="searchForm.get('publishYear')!"
+      ></bf-clear-form-field>
+    </mat-form-field>
 
-    <p>
-      <mat-form-field appearance="outline">
-        <mat-label
-          >Language
-          <mat-icon
-            matTooltip="
-          enter the first three letters of the language; japan uses jpn; mul
-          for multiple; und for undetermined
+    <mat-form-field appearance="outline">
+      <mat-label
+        >Language
+        <mat-icon
+          (click)="languageTooltip.show()"
+          #languageTooltip="matTooltip"
+          matTooltip="
+          enter the first three letters of the language. japan uses 'jpn'. 'mul'
+          for multiple and 'und' for undetermined
         "
-            matTooltipPosition="above"
-            fontIcon="info"
-        /></mat-label>
-        <input
-          formControlName="language"
-          maxlength="3"
-          matInput
-          placeholder="eng"
-        />
-        <button
-          matSuffix
-          type="button"
-          class="clear-button"
-          mat-mini-fab
-          (click)="clearField('language')"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field appearance="outline">
-        <mat-label
-          >Place
-          <mat-icon
-            matTooltip="Will find any books about '{{ place?.value }}'
+          matTooltipPosition="above"
+          fontIcon="info"
+      /></mat-label>
+      <input
+        formControlName="language"
+        maxlength="3"
+        matInput
+        placeholder="eng"
+      />
+      <bf-clear-form-field
+        matSuffix
+        [control]="searchForm.get('language')!"
+      ></bf-clear-form-field>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label
+        >Place
+        <mat-icon
+          (click)="placeTooltip.show()"
+          #placeTooltip="matTooltip"
+          matTooltip="Will find any books about '{{ place?.value }}'
           (multiple allowed, separated by spaces or commas)"
-            matTooltipPosition="above"
-            fontIcon="info"
-        /></mat-label>
-        <input formControlName="place" matInput placeholder="Utrecht" />
-        <button
-          matSuffix
-          type="button"
-          class="clear-button"
-          mat-mini-fab
-          (click)="clearField('place')"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field appearance="outline">
-        <mat-label
-          >Subject
-          <mat-icon
-            matTooltip="Will find any books about '{{ subject?.value }}'
+          matTooltipPosition="above"
+          fontIcon="info"
+      /></mat-label>
+      <input formControlName="place" matInput placeholder="Utrecht" />
+      <bf-clear-form-field
+        matSuffix
+        [control]="searchForm.get('place')!"
+      ></bf-clear-form-field>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label
+        >Subject
+        <mat-icon
+          (click)="subjectTooltip.show()"
+          #subjectTooltip="matTooltip"
+          matTooltip="Will find any books about '{{ subject?.value }}'
           (multiple allowed, separated by spaces or commas)"
-            matTooltipPosition="above"
-            fontIcon="info"
-        /></mat-label>
-        <input formControlName="subject" matInput placeholder="Fantasy" />
-        <button
-          matSuffix
-          type="button"
-          class="clear-button"
-          mat-mini-fab
-          (click)="clearField('subject')"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field appearance="outline">
-        <mat-label
-          >Publisher
-          <mat-icon
-            matTooltip=" Will find any books by a publisher with '{{
-              publisher?.value
-            }}' in their name"
-            matTooltipPosition="above"
-            fontIcon="info"
-        /></mat-label>
-        <input formControlName="publisher" matInput placeholder="Malmberg" />
-        <button
-          matSuffix
-          type="button"
-          class="clear-button"
-          mat-mini-fab
-          (click)="clearField('publisher')"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field appearance="outline">
-        <mat-label
-          >Character
-          <mat-icon
-            matTooltip="Will find any books with '{{ person?.value }}' in it
+          matTooltipPosition="above"
+          fontIcon="info"
+      /></mat-label>
+      <input formControlName="subject" matInput placeholder="Fantasy" />
+      <bf-clear-form-field
+        matSuffix
+        [control]="searchForm.get('subject')!"
+      ></bf-clear-form-field>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label
+        >Publisher
+        <mat-icon
+          (click)="publisherTooltip.show()"
+          #publisherTooltip="matTooltip"
+          matTooltip=" Will find any books by a publisher with '{{
+            publisher?.value
+          }}' in their name"
+          matTooltipPosition="above"
+          fontIcon="info"
+      /></mat-label>
+      <input formControlName="publisher" matInput placeholder="Malmberg" />
+      <bf-clear-form-field
+        matSuffix
+        [control]="searchForm.get('publisher')!"
+      ></bf-clear-form-field>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label
+        >Character
+        <mat-icon
+          (click)="personTooltip.show()"
+          #personTooltip="matTooltip"
+          matTooltip="Will find any books with '{{ person?.value }}' in it
         (multiple allowed, separated by spaces or commas)"
-            matTooltipPosition="above"
-            fontIcon="info"
-        /></mat-label>
-        <input formControlName="person" matInput placeholder="Harry Potter" />
-        <button
-          matSuffix
-          type="button"
-          class="clear-button"
-          mat-mini-fab
-          (click)="clearField('person')"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-form-field>
-    </p>
+          matTooltipPosition="above"
+          fontIcon="info"
+      /></mat-label>
+      <input formControlName="person" matInput placeholder="Harry Potter" />
+      <bf-clear-form-field
+        matSuffix
+        [control]="searchForm.get('person')!"
+      ></bf-clear-form-field>
+    </mat-form-field>
   </div>
 
   <div
