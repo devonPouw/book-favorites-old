@@ -1,3 +1,5 @@
+import { SortDirection } from '@angular/material/sort';
+
 export interface BookFilter {
   specialQuery: string;
   title: string;
@@ -8,6 +10,7 @@ export interface BookFilter {
   place: string;
   person: string;
   sort: string;
+  order: SortDirection;
   limit: number;
   page: number;
 }

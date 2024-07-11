@@ -1,16 +1,15 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  computed,
-  effect,
   ElementRef,
   inject,
   signal,
+  ViewChild,
   viewChild,
 } from '@angular/core';
 import { BookStoreService } from '../services/book-store.service';
 import { BookListItemComponent } from '../book-list-item/book-list-item.component';
-import { BookList } from '../models/book-list';
 import { AsyncPipe, DatePipe, NgIf } from '@angular/common';
 import {
   FormControl,
@@ -23,18 +22,31 @@ import {
   IsbnValidatorDirective,
 } from '../directives/isbn-validator.directive';
 import { MatButtonModule } from '@angular/material/button';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import {
+  MatPaginator,
+  MatPaginatorModule,
+  PageEvent,
+} from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
-import { Select } from '../../shared/models/select';
 import { ClearFormFieldComponent } from '../../shared/clear-form-field/clear-form-field.component';
 import { MatTableModule } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
-import { MatSortModule } from '@angular/material/sort';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import {
+  catchError,
+  map,
+  merge,
+  of,
+  startWith,
+  Subject,
+  switchMap,
+} from 'rxjs';
+import { Book } from '../models/book';
 
 @Component({
   selector: 'bf-book-list',
@@ -63,24 +75,15 @@ import { MatSortModule } from '@angular/material/sort';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BookListComponent {
+export class BookListComponent implements AfterViewInit {
   private bookStoreService = inject(BookStoreService);
 
   listContainer = viewChild<ElementRef>('listContainer');
-
-  resultsLength = 0;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   private specialQuery = '';
   private language = '';
-  public sortOptions: Select[] = [
-    { value: 'title', viewValue: 'Title (A-Z)' },
-    { value: 'rating desc', viewValue: 'Rating (high to low)' },
-    { value: 'rating asc', viewValue: 'Rating (low to high)' },
-    { value: 'new', viewValue: 'Year (new to old)' },
-    { value: 'old', viewValue: 'Year (old to new)' },
-    { value: 'editions', viewValue: 'Editions' },
-    { value: 'scans', viewValue: 'Scans' },
-  ];
 
   pageSizeOptions = [25, 50, 100];
   currentPage = signal(1);
@@ -94,7 +97,7 @@ export class BookListComponent {
     publisher: new FormControl(''),
     person: new FormControl(''),
     place: new FormControl(''),
-    sort: new FormControl(this.sortOptions[0].value),
+    sort: new FormControl('title'),
     limit: new FormControl(this.pageSizeOptions[0]),
   });
 
@@ -135,59 +138,57 @@ export class BookListComponent {
     this.pageEvent = e;
     this.limit?.setValue(e.pageSize);
     this.page.set(e.pageIndex + 1);
-    this.triggerSearch();
+    this.listContainer()?.nativeElement.scrollIntoView();
   }
 
   isSearchButtonDisabled = () => {
     return this.isbn?.invalid && !!this.isbn?.value;
   };
 
-  isLoading = signal(false);
+  isLoading = signal(true);
   page = signal(1);
-  books = signal<BookList | null>(null);
-  totalPages = computed(() => {
-    const currentBooks = this.books();
-    const limit = this.searchForm.get('limit')?.value ?? 10;
-    return currentBooks ? Math.ceil(currentBooks.numFound / limit) : 0;
-  });
+  books: Book[] = [];
+
   displayedColumns: string[] = [
     'title',
     'rating',
-    'year',
+    'first_publish_year',
     'ebook_access',
-    'ddc',
-    'lcc',
+    'ddc_sort',
+    'lcc_sort',
     'more',
   ];
 
-  constructor() {
-    effect(() => {
-      if (!this.specialQuery) {
-        this.specialQuery = '*';
-      }
-      const bookFilter = {
-        specialQuery: this.specialQuery,
-        title: this.searchForm.value.title?.trim() ?? '',
-        author: this.searchForm.value.author?.trim() ?? '',
-        isbn: this.searchForm.value.isbn?.trim() ?? '',
-        subject: this.searchForm.value.subject?.trim() ?? '',
-        publisher: this.searchForm.value.publisher?.trim() ?? '',
-        person: this.searchForm.value.person?.trim() ?? '',
-        place: this.searchForm.value.place?.trim() ?? '',
-        sort: this.searchForm.get('sort')?.value ?? 'title',
-        limit: this.searchForm.value.limit ?? this.pageSizeOptions[0],
-        page: this.page(),
-      };
-      this.bookStoreService.searchBooks(bookFilter).subscribe({
-        next: (books) => this.books.set(books),
-        error: (err) => {
-          console.error('Error fetching initial books:', err);
-        },
-      });
-    });
-  }
+  searchTrigger$ = new Subject<void>();
+  resultsLength = 0;
 
-  onSubmit() {
+  ngAfterViewInit() {
+    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+    this.searchTrigger$.subscribe(() => (this.paginator.pageIndex = 0));
+
+    merge(this.sort.sortChange, this.paginator.page, this.searchTrigger$)
+      .pipe(
+        startWith({}),
+        switchMap(() => {
+          this.isLoading.set(true);
+          return this.bookStoreService
+            .searchBooks(this.formBuilder())
+            .pipe(catchError(() => of(null)));
+        }),
+        map((books) => {
+          this.isLoading.set(false);
+
+          if (books === null) {
+            return [];
+          }
+
+          this.resultsLength = books.numFound;
+          return books.docs;
+        })
+      )
+      .subscribe((books) => (this.books = books));
+  }
+  formBuilder() {
     if (this.searchForm.value.publishYear) {
       console.log(this.searchForm.value.publishYear);
       const publishYears = this.searchForm.value.publishYear.split('-');
@@ -207,18 +208,10 @@ export class BookListComponent {
         this.specialQuery = `language%3A${this.language}`;
       }
     }
-    this.page.set(1);
-    this.currentPage.set(1);
-    this.isLoading.set(true);
-    this.triggerSearch();
-  }
-
-  private triggerSearch(): void {
     if (!this.specialQuery) {
       this.specialQuery = '*';
     }
-    this.listContainer()?.nativeElement.scrollIntoView();
-    const bookFilter = {
+    return {
       specialQuery: this.specialQuery,
       title: this.searchForm.value.title?.trim() ?? '',
       author: this.searchForm.value.author?.trim() ?? '',
@@ -227,24 +220,16 @@ export class BookListComponent {
       publisher: this.searchForm.value.publisher?.trim() ?? '',
       person: this.searchForm.value.person?.trim() ?? '',
       place: this.searchForm.value.place?.trim() ?? '',
-      sort: this.searchForm.get('sort')?.value ?? 'title',
+      sort: this.sort.active ?? 'title',
+      order: this.sort.direction ?? 'desc',
       limit: this.searchForm.value.limit ?? this.pageSizeOptions[0],
       page: this.page(),
     };
-    this.bookStoreService.searchBooks(bookFilter).subscribe({
-      next: (books) => {
-        this.books.set(books);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Error searching for books:', err);
-      },
-    });
   }
 
   clearForm() {
     this.searchForm.reset();
-    this.searchForm.get('sort')?.setValue(this.sortOptions[0].value);
+    this.searchForm.get('sort')?.setValue('title');
     this.searchForm.get('limit')?.setValue(this.pageSizeOptions[0]);
   }
 
