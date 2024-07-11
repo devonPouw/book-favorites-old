@@ -6,13 +6,14 @@ import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
 
 import { BookStoreService } from '../services/book-store.service';
 import { Author } from '../models/author';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'bf-book-details',
   templateUrl: './book-details.component.html',
   styleUrl: './book-details.component.scss',
   standalone: true,
-  imports: [AsyncPipe, RouterLink],
+  imports: [AsyncPipe, RouterLink, MatButtonModule],
 })
 export class BookDetailsComponent {
   private service = inject(BookStoreService);
