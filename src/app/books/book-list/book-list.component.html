@@ -1,3 +1,4 @@
+<h1>Search books by criteria</h1>
 <form [formGroup]="searchForm" (ngSubmit)="onSubmit()">
   <div style="width: 100%; display: flex; justify-content: space-between">
     <button
@@ -217,37 +218,105 @@
   </div>
 </form>
 
-<div #listContainer>
-  <h1>Books</h1>
-  @if (books(); as books) {
-  <ul class="book-list">
-    @for (book of books.docs; track book.key) {
-    <li>
-      @if (!isLoading()) {
-      <bf-book-list-item [book]="book"></bf-book-list-item>
-      } @else {
-      <bf-book-skeleton></bf-book-skeleton>
-      }
-    </li>
-    } @empty {
-    <li>No books available.</li>
+<div #listContainer class="example-container mat-elevation-z8">
+  @if (isLoading() ) {
+  <div class="example-loading-shade">
+    @if (isLoading()) {
+    <mat-spinner></mat-spinner>
     }
-  </ul>
-  @if (totalPages(); as totalPages;) {
-  <div style="width: 100%; display: flex; justify-content: center">
-    <mat-paginator
-      #paginator
-      class="demo-paginator"
-      (page)="handlePageEvent($event)"
-      [length]="books.numFound"
-      [pageSize]="limit"
-      [showFirstLastButtons]="true"
-      [pageSizeOptions]="pageSizeOptions"
-      [pageIndex]="page() - 1"
-      aria-label="Select page"
-    >
-    </mat-paginator>
   </div>
+
+  } @if (books(); as books) {
+  <div class="example-table-container">
+    <table
+      mat-table
+      [dataSource]="books.docs"
+      class="example-table"
+      matSort
+      matSortActive="created"
+      matSortDisableClear
+      matSortDirection="desc"
+    >
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Title</th>
+        <td mat-cell *matCellDef="let row">
+          <div *ngIf="row.title">{{ row.title }}</div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="rating">
+        <th mat-header-cell *matHeaderCellDef>Rating</th>
+        <td mat-cell *matCellDef="let row">
+          @if(row.ratings_average){
+          <div style="display: flex; flex-direction: row">
+            @for (item of getStarsArray(row.ratings_average); track $index) {
+            <ng-container style="width: 30px">
+              <img
+                style="height: 24px; width: 24px"
+                src="star.svg"
+                alt="Star Rating"
+                [class.half]="
+                  $index === parseRating(row.ratings_average) &&
+                  row.ratings_average % 1 >= 0.5
+                "
+              />
+            </ng-container>
+            }
+            <p style="width: 40px">
+              {{ row.ratings_average.toString().slice(0, 3) }}
+            </p>
+            <p>({{ row.ratings_count }} reviews)</p>
+          </div>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="year">
+        <th mat-header-cell *matHeaderCellDef>First published</th>
+        <td mat-cell *matCellDef="let row">
+          <div *ngIf="row.first_publish_year">{{ row.first_publish_year }}</div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="ebook_access">
+        <th mat-header-cell *matHeaderCellDef>Ebook access</th>
+        <td mat-cell *matCellDef="let row">
+          <div *ngIf="row.ebook_count_i">{{ row.ebook_count_i }}</div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="ddc">
+        <th mat-header-cell *matHeaderCellDef>DDC</th>
+        <td mat-cell *matCellDef="let row">
+          <div *ngIf="row.ddc">{{ row.ddc }}</div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="lcc">
+        <th mat-header-cell *matHeaderCellDef>LCC</th>
+        <td mat-cell *matCellDef="let row">
+          <div *ngIf="row.lcc">{{ row.lcc }}</div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="more">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let row">
+          <a mat-button [routerLink]="'.' + row.key.substring(6)">More info</a>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+  @if (totalPages(); as totalPages;) {
+  <mat-paginator
+    #paginator
+    class="demo-paginator"
+    (page)="handlePageEvent($event)"
+    [length]="books.numFound"
+    [pageSize]="limit"
+    [showFirstLastButtons]="true"
+    [pageSizeOptions]="pageSizeOptions"
+    [pageIndex]="page() - 1"
+    aria-label="Select page"
+  >
+  </mat-paginator>
+
   } } @else {
   <div class="loader">
     <mat-spinner></mat-spinner>

@@ -1,44 +1,62 @@
-@if(book(); as book) {
-<a [routerLink]="'.' + book.key.substring(6)" class="list-item">
-  <h2>{{ book.title }}</h2>
-  @if(book.ratings_average){
-  <div style="display: flex; flex-direction: row">
-    @for (item of getStarsArray(book.ratings_average); track $index) {
-    <ng-container style="width: 30px">
-      <img
-        style="height: 24px; width: 24px"
-        src="star.svg"
-        alt="Star Rating"
-        [class.half]="
-          $index === parseRating(book.ratings_average) &&
-          book.ratings_average % 1 >= 0.5
-        "
-      />
-    </ng-container>
+<ng-container matColumnDef="title">
+  <th mat-header-cell *matHeaderCellDef>Title</th>
+  <td mat-cell *matCellDef="let row">
+    <div *ngIf="row.title">{{ row.title }}</div>
+  </td>
+</ng-container>
+<ng-container matColumnDef="rating">
+  <th mat-header-cell *matHeaderCellDef>Rating</th>
+  <td mat-cell *matCellDef="let row">
+    @if(row.ratings_average){
+    <div style="display: flex; flex-direction: row">
+      @for (item of getStarsArray(row.ratings_average); track $index) {
+      <ng-container style="width: 30px">
+        <img
+          style="height: 24px; width: 24px"
+          src="star.svg"
+          alt="Star Rating"
+          [class.half]="
+            $index === parseRating(row.ratings_average) &&
+            row.ratings_average % 1 >= 0.5
+          "
+        />
+      </ng-container>
+      }
+      <p style="width: 40px">
+        {{ row.ratings_average.toString().slice(0, 3) }}
+      </p>
+      <p>({{ row.ratings_count }} reviews)</p>
+    </div>
     }
-
-    <p style="width: 40px">{{ book.ratings_average.toString().slice(0, 3) }}</p>
-    <p>({{ book.ratings_count }} reviews)</p>
-  </div>
-  } @if(book.cover_i) {
-  <img
-    [src]="'https://covers.openlibrary.org/b/id/' + book.cover_i + '-M.jpg'"
-    alt="Cover"
-    width="120"
-    height="175"
-  />
-  }@else {
-  <img src="no-image-found.jpg" alt="" />
-  }
-  <ul class="comma-list">
-    By @for (author of book.author_name; track $index) {
-    <li>
-      {{ author }}
-    </li>
-    }
-  </ul>
-  @if (book.isbn) {
-  <p>ISBN {{ book.isbn[0] }}</p>
-  }
-</a>
-}
+  </td>
+</ng-container>
+<ng-container matColumnDef="year">
+  <th mat-header-cell *matHeaderCellDef>First published</th>
+  <td mat-cell *matCellDef="let row">
+    <div *ngIf="row.first_publish_year">{{ row.first_publish_year }}</div>
+  </td>
+</ng-container>
+<ng-container matColumnDef="ebook_access">
+  <th mat-header-cell *matHeaderCellDef>Ebook access</th>
+  <td mat-cell *matCellDef="let row">
+    <div *ngIf="row.ebook_count_i">{{ row.ebook_count_i }}</div>
+  </td>
+</ng-container>
+<ng-container matColumnDef="ddc">
+  <th mat-header-cell *matHeaderCellDef>DDC</th>
+  <td mat-cell *matCellDef="let row">
+    <div *ngIf="row.ddc">{{ row.ddc }}</div>
+  </td>
+</ng-container>
+<ng-container matColumnDef="lcc">
+  <th mat-header-cell *matHeaderCellDef>LCC</th>
+  <td mat-cell *matCellDef="let row">
+    <div *ngIf="row.lcc">{{ row.lcc }}</div>
+  </td>
+</ng-container>
+<ng-container matColumnDef="more">
+  <th mat-header-cell *matHeaderCellDef></th>
+  <td mat-cell *matCellDef="let row">
+    <a mat-button [routerLink]="'.' + row.key.substring(6)">More info</a>
+  </td>
+</ng-container>

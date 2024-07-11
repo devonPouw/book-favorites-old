@@ -5,22 +5,19 @@ import {
   effect,
   ElementRef,
   inject,
-  OnInit,
   signal,
   viewChild,
 } from '@angular/core';
 import { BookStoreService } from '../services/book-store.service';
 import { BookListItemComponent } from '../book-list-item/book-list-item.component';
-import { Subject } from 'rxjs';
 import { BookList } from '../models/book-list';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe, DatePipe, NgIf } from '@angular/common';
 import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { BookSkeletonComponent } from '../book-skeleton/book-skeleton.component';
 import {
   isbnValidator,
   IsbnValidatorDirective,
@@ -35,6 +32,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { Select } from '../../shared/models/select';
 import { ClearFormFieldComponent } from '../../shared/clear-form-field/clear-form-field.component';
+import { MatTableModule } from '@angular/material/table';
+import { RouterLink } from '@angular/router';
+import { MatSortModule } from '@angular/material/sort';
 
 @Component({
   selector: 'bf-book-list',
@@ -43,28 +43,32 @@ import { ClearFormFieldComponent } from '../../shared/clear-form-field/clear-for
   standalone: true,
   imports: [
     BookListItemComponent,
-    BookSkeletonComponent,
     ClearFormFieldComponent,
     AsyncPipe,
     ReactiveFormsModule,
-    NgIf,
+    DatePipe,
     IsbnValidatorDirective,
     MatButtonModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
+    MatSortModule,
     MatTooltipModule,
-    MatInputModule,
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
     MatSelectModule,
+    MatTableModule,
+    RouterLink,
+    NgIf,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BookListComponent implements OnInit {
+export class BookListComponent {
   private bookStoreService = inject(BookStoreService);
 
   listContainer = viewChild<ElementRef>('listContainer');
+
+  resultsLength = 0;
 
   private specialQuery = '';
   private language = '';
@@ -78,7 +82,7 @@ export class BookListComponent implements OnInit {
     { value: 'scans', viewValue: 'Scans' },
   ];
 
-  pageSizeOptions = [5, 10, 25, 100];
+  pageSizeOptions = [25, 50, 100];
   currentPage = signal(1);
   searchForm = new FormGroup({
     title: new FormControl(''),
@@ -138,30 +142,49 @@ export class BookListComponent implements OnInit {
     return this.isbn?.invalid && !!this.isbn?.value;
   };
 
-  searchTrigger$ = new Subject<void>();
   isLoading = signal(false);
   page = signal(1);
   books = signal<BookList | null>(null);
-
   totalPages = computed(() => {
     const currentBooks = this.books();
     const limit = this.searchForm.get('limit')?.value ?? 10;
     return currentBooks ? Math.ceil(currentBooks.numFound / limit) : 0;
   });
+  displayedColumns: string[] = [
+    'title',
+    'rating',
+    'year',
+    'ebook_access',
+    'ddc',
+    'lcc',
+    'more',
+  ];
 
   constructor() {
     effect(() => {
-      this.bookStoreService.getInitial().subscribe({
+      if (!this.specialQuery) {
+        this.specialQuery = '*';
+      }
+      const bookFilter = {
+        specialQuery: this.specialQuery,
+        title: this.searchForm.value.title?.trim() ?? '',
+        author: this.searchForm.value.author?.trim() ?? '',
+        isbn: this.searchForm.value.isbn?.trim() ?? '',
+        subject: this.searchForm.value.subject?.trim() ?? '',
+        publisher: this.searchForm.value.publisher?.trim() ?? '',
+        person: this.searchForm.value.person?.trim() ?? '',
+        place: this.searchForm.value.place?.trim() ?? '',
+        sort: this.searchForm.get('sort')?.value ?? 'title',
+        limit: this.searchForm.value.limit ?? this.pageSizeOptions[0],
+        page: this.page(),
+      };
+      this.bookStoreService.searchBooks(bookFilter).subscribe({
         next: (books) => this.books.set(books),
         error: (err) => {
           console.error('Error fetching initial books:', err);
         },
       });
     });
-  }
-
-  ngOnInit() {
-    this.searchTrigger$.next();
   }
 
   onSubmit() {
@@ -223,6 +246,18 @@ export class BookListComponent implements OnInit {
     this.searchForm.reset();
     this.searchForm.get('sort')?.setValue(this.sortOptions[0].value);
     this.searchForm.get('limit')?.setValue(this.pageSizeOptions[0]);
-    this.searchForm.get('publishYear2')?.disable();
+  }
+
+  getStarsArray(rating: number): number[] {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    return Array.from(
+      { length: fullStars + (hasHalfStar ? 1 : 0) },
+      (_, i) => i + 1
+    );
+  }
+
+  parseRating(rating: number): number {
+    return Math.floor(rating);
   }
 }
