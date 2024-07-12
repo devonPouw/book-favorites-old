@@ -210,17 +210,17 @@
   </div>
 </form>
 
-<div #listContainer class="example-container mat-elevation-z8">
+<div #listContainer class="container mat-elevation-z8">
   @if (isLoading() ) {
-  <div class="example-loading-shade">
+  <div class="loading-shade">
     @if (isLoading()) {
     <mat-spinner></mat-spinner>
     }
   </div>
 
   }
-  <div class="example-table-container">
-    <table mat-table [dataSource]="books" class="example-table" matSort>
+  <div class="table-container">
+    <table mat-table [dataSource]="books" matSort>
       <ng-container matColumnDef="title">
         <th mat-header-cell *matHeaderCellDef>Title</th>
         <td mat-cell *matCellDef="let row">
@@ -233,9 +233,9 @@
           @if(row.ratings_average){
           <div style="display: flex; flex-direction: row">
             @for (item of getStarsArray(row.ratings_average); track $index) {
-            <ng-container style="width: 30px">
+            <ng-container>
               <img
-                style="height: 24px; width: 24px"
+                class="rating-star"
                 src="star.svg"
                 alt="Star Rating"
                 [class.half]="
@@ -245,26 +245,28 @@
               />
             </ng-container>
             }
-            <p style="width: 40px">
+          </div>
+          <div style="display: flex; flex-direction: row">
+            <p>
               {{ row.ratings_average.toString().slice(0, 3) }}
             </p>
-            <p>({{ row.ratings_count }} reviews)</p>
+            <p style="font-size: smaller">
+              &nbsp;({{ row.ratings_count }} reviews)
+            </p>
           </div>
           }
         </td>
       </ng-container>
-      <ng-container matColumnDef="first_publish_year">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          First published
-        </th>
+      <ng-container matColumnDef="year">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Year</th>
         <td mat-cell *matCellDef="let row">
           <div *ngIf="row.first_publish_year">{{ row.first_publish_year }}</div>
         </td>
       </ng-container>
       <ng-container matColumnDef="ebook_access">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Ebook access</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Ebook</th>
         <td mat-cell *matCellDef="let row">
-          <div *ngIf="row.ebook_count_i">{{ row.ebook_count_i }}</div>
+          <div *ngIf="row.ebook_access">{{ row.ebook_access }}</div>
         </td>
       </ng-container>
       <ng-container matColumnDef="ddc_sort">
@@ -282,7 +284,9 @@
       <ng-container matColumnDef="more">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let row">
-          <a mat-button [routerLink]="'.' + row.key.substring(6)">More info</a>
+          <a [routerLink]="'.' + row.key.substring(6)"
+            ><mat-icon fontIcon="arrow_circle_right"></mat-icon
+          ></a>
         </td>
       </ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

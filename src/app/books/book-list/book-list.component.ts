@@ -152,7 +152,7 @@ export class BookListComponent implements AfterViewInit {
   displayedColumns: string[] = [
     'title',
     'rating',
-    'first_publish_year',
+    'year',
     'ebook_access',
     'ddc_sort',
     'lcc_sort',
@@ -190,7 +190,6 @@ export class BookListComponent implements AfterViewInit {
   }
   formBuilder() {
     if (this.searchForm.value.publishYear) {
-      console.log(this.searchForm.value.publishYear);
       const publishYears = this.searchForm.value.publishYear.split('-');
       if (publishYears.length === 2) {
         this.specialQuery = `first_publish_year%3A[${publishYears[0]} TO ${publishYears[1]}]`;
@@ -211,6 +210,21 @@ export class BookListComponent implements AfterViewInit {
     if (!this.specialQuery) {
       this.specialQuery = '*';
     }
+    if (this.sort.direction === '') {
+      this.sort.active = 'title';
+    }
+    let sort = this.sort.active;
+    let direction = this.sort.direction;
+
+    if (this.sort.active === 'year' && this.sort.direction === 'desc') {
+      sort = 'new';
+      direction = '';
+    }
+    if (this.sort.active === 'year' && this.sort.direction === 'asc') {
+      sort = 'old';
+      direction = '';
+    }
+
     return {
       specialQuery: this.specialQuery,
       title: this.searchForm.value.title?.trim() ?? '',
@@ -220,8 +234,8 @@ export class BookListComponent implements AfterViewInit {
       publisher: this.searchForm.value.publisher?.trim() ?? '',
       person: this.searchForm.value.person?.trim() ?? '',
       place: this.searchForm.value.place?.trim() ?? '',
-      sort: this.sort.active ?? 'title',
-      order: this.sort.direction ?? 'desc',
+      sort: sort,
+      order: direction,
       limit: this.searchForm.value.limit ?? this.pageSizeOptions[0],
       page: this.page(),
     };
