@@ -9,7 +9,6 @@ import {
   viewChild,
 } from '@angular/core';
 import { BookStoreService } from '../services/book-store.service';
-import { BookListItemComponent } from '../book-list-item/book-list-item.component';
 import { AsyncPipe, DatePipe, NgIf } from '@angular/common';
 import {
   FormControl,
@@ -47,6 +46,7 @@ import {
   switchMap,
 } from 'rxjs';
 import { Book } from '../models/book';
+import { BookRatingComponent } from '../book-rating/book-rating.component';
 
 @Component({
   selector: 'bf-book-list',
@@ -54,7 +54,6 @@ import { Book } from '../models/book';
   styleUrl: './book-list.component.scss',
   standalone: true,
   imports: [
-    BookListItemComponent,
     ClearFormFieldComponent,
     AsyncPipe,
     ReactiveFormsModule,
@@ -72,6 +71,7 @@ import { Book } from '../models/book';
     MatTableModule,
     RouterLink,
     NgIf,
+    BookRatingComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -83,10 +83,9 @@ export class BookListComponent implements AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   private specialQuery = '';
-  private language = '';
 
   pageSizeOptions = [25, 50, 100];
-  currentPage = signal(1);
+  currentPage = signal(0);
   searchForm = new FormGroup({
     title: new FormControl(''),
     author: new FormControl(''),
@@ -117,7 +116,9 @@ export class BookListComponent implements AfterViewInit {
   get publishYear() {
     return this.searchForm.get('publishYear');
   }
-
+  get language() {
+    return this.searchForm.get('language');
+  }
   get place() {
     return this.searchForm.get('place');
   }
@@ -137,7 +138,7 @@ export class BookListComponent implements AfterViewInit {
     this.isLoading.set(true);
     this.pageEvent = e;
     this.limit?.setValue(e.pageSize);
-    this.page.set(e.pageIndex + 1);
+    this.currentPage.set(e.pageIndex + 1);
     this.listContainer()?.nativeElement.scrollIntoView();
   }
 
@@ -146,7 +147,6 @@ export class BookListComponent implements AfterViewInit {
   };
 
   isLoading = signal(true);
-  page = signal(1);
   books: Book[] = [];
 
   displayedColumns: string[] = [
@@ -200,11 +200,11 @@ export class BookListComponent implements AfterViewInit {
       this.specialQuery = '';
     }
     if (this.searchForm.value.language) {
-      this.language = this.searchForm.value.language.trim();
+      const language = this.searchForm.value.language.trim();
       if (this.specialQuery) {
-        this.specialQuery += `+language%3A${this.language}`;
+        this.specialQuery += `+language%3A${language}`;
       } else {
-        this.specialQuery = `language%3A${this.language}`;
+        this.specialQuery = `language%3A${language}`;
       }
     }
     if (!this.specialQuery) {
@@ -237,7 +237,7 @@ export class BookListComponent implements AfterViewInit {
       sort: sort,
       order: direction,
       limit: this.searchForm.value.limit ?? this.pageSizeOptions[0],
-      page: this.page(),
+      page: this.currentPage() + 1,
     };
   }
 
@@ -245,18 +245,5 @@ export class BookListComponent implements AfterViewInit {
     this.searchForm.reset();
     this.searchForm.get('sort')?.setValue('title');
     this.searchForm.get('limit')?.setValue(this.pageSizeOptions[0]);
-  }
-
-  getStarsArray(rating: number): number[] {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    return Array.from(
-      { length: fullStars + (hasHalfStar ? 1 : 0) },
-      (_, i) => i + 1
-    );
-  }
-
-  parseRating(rating: number): number {
-    return Math.floor(rating);
   }
 }

@@ -24,10 +24,7 @@
           fontIcon="info"
       /></mat-label>
       <input formControlName="title" matInput placeholder="Lord of the Rings" />
-      <bf-clear-form-field
-        matSuffix
-        [control]="searchForm.get('title')!"
-      ></bf-clear-form-field>
+      <bf-clear-form-field matSuffix [control]="title!"></bf-clear-form-field>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -42,10 +39,7 @@
           fontIcon="info"
       /></mat-label>
       <input formControlName="author" matInput placeholder="Roald Dahl" />
-      <bf-clear-form-field
-        matSuffix
-        [control]="searchForm.get('author')!"
-      ></bf-clear-form-field>
+      <bf-clear-form-field matSuffix [control]="author!"></bf-clear-form-field>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -68,10 +62,7 @@
         placeholder="1234567890"
         bfIsbnValidator
       />
-      <bf-clear-form-field
-        matSuffix
-        [control]="searchForm.get('isbn')!"
-      ></bf-clear-form-field>
+      <bf-clear-form-field matSuffix [control]="isbn!"></bf-clear-form-field>
       <mat-hint
         >@if(isSearchButtonDisabled() && isbn){
         <span>ISBN is invalid</span>
@@ -96,7 +87,7 @@
       <input formControlName="publishYear" matInput placeholder="2024" />
       <bf-clear-form-field
         matSuffix
-        [control]="searchForm.get('publishYear')!"
+        [control]="publishYear!"
       ></bf-clear-form-field>
     </mat-form-field>
 
@@ -121,7 +112,7 @@
       />
       <bf-clear-form-field
         matSuffix
-        [control]="searchForm.get('language')!"
+        [control]="language!"
       ></bf-clear-form-field>
     </mat-form-field>
 
@@ -137,10 +128,7 @@
           fontIcon="info"
       /></mat-label>
       <input formControlName="place" matInput placeholder="Utrecht" />
-      <bf-clear-form-field
-        matSuffix
-        [control]="searchForm.get('place')!"
-      ></bf-clear-form-field>
+      <bf-clear-form-field matSuffix [control]="place!"></bf-clear-form-field>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -155,10 +143,7 @@
           fontIcon="info"
       /></mat-label>
       <input formControlName="subject" matInput placeholder="Fantasy" />
-      <bf-clear-form-field
-        matSuffix
-        [control]="searchForm.get('subject')!"
-      ></bf-clear-form-field>
+      <bf-clear-form-field matSuffix [control]="subject!"></bf-clear-form-field>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -176,7 +161,7 @@
       <input formControlName="publisher" matInput placeholder="Malmberg" />
       <bf-clear-form-field
         matSuffix
-        [control]="searchForm.get('publisher')!"
+        [control]="publisher!"
       ></bf-clear-form-field>
     </mat-form-field>
 
@@ -194,7 +179,7 @@
       <input formControlName="person" matInput placeholder="Harry Potter" />
       <bf-clear-form-field
         matSuffix
-        [control]="searchForm.get('person')!"
+        [control]="publisher!"
       ></bf-clear-form-field>
     </mat-form-field>
   </div>
@@ -230,31 +215,7 @@
       <ng-container matColumnDef="rating">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Rating</th>
         <td mat-cell *matCellDef="let row">
-          @if(row.ratings_average){
-          <div style="display: flex; flex-direction: row">
-            @for (item of getStarsArray(row.ratings_average); track $index) {
-            <ng-container>
-              <img
-                class="rating-star"
-                src="star.svg"
-                alt="Star Rating"
-                [class.half]="
-                  $index === parseRating(row.ratings_average) &&
-                  row.ratings_average % 1 >= 0.5
-                "
-              />
-            </ng-container>
-            }
-          </div>
-          <div style="display: flex; flex-direction: row">
-            <p>
-              {{ row.ratings_average.toString().slice(0, 3) }}
-            </p>
-            <p style="font-size: smaller">
-              &nbsp;({{ row.ratings_count }} reviews)
-            </p>
-          </div>
-          }
+          <bf-book-rating [row]="row"></bf-book-rating>
         </td>
       </ng-container>
       <ng-container matColumnDef="year">
@@ -295,18 +256,17 @@
         <td class="mat-cell" colspan="4">No books found matching the filter</td>
       </tr>
     </table>
-  </div>
 
-  <mat-paginator
-    #paginator
-    class="demo-paginator"
-    (page)="handlePageEvent($event)"
-    [length]="resultsLength"
-    [pageSize]="limit"
-    [showFirstLastButtons]="true"
-    [pageSizeOptions]="pageSizeOptions"
-    [pageIndex]="page() - 1"
-    aria-label="Select page"
-  >
-  </mat-paginator>
+    <mat-paginator
+      #paginator
+      (page)="handlePageEvent($event)"
+      [length]="resultsLength"
+      [pageSize]="limit"
+      [showFirstLastButtons]="true"
+      [pageSizeOptions]="pageSizeOptions"
+      [pageIndex]="currentPage()"
+      aria-label="Select page"
+    >
+    </mat-paginator>
+  </div>
 </div>
