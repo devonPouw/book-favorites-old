@@ -6,17 +6,14 @@
       class="rating-star"
       src="star.svg"
       alt="Star Rating"
-      [class.half]="
-        $index === parseRating(row.ratings_average) &&
-        row.ratings_average % 1 >= 0.5
-      "
+      [class.half]="isStarHalf($index, row.ratings_average)"
     />
   </ng-container>
   }
 </div>
 <div style="display: flex; flex-direction: row">
   <p>
-    {{ row.ratings_average.toString().slice(0, 3) }}
+    {{ row.ratings_average | number : "1.1-1" }}
   </p>
   <p style="font-size: smaller">&nbsp;({{ row.ratings_count }} reviews)</p>
 </div>

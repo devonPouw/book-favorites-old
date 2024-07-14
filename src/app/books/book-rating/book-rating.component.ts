@@ -1,9 +1,10 @@
+import { DecimalPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'bf-book-rating',
   standalone: true,
-  imports: [],
+  imports: [DecimalPipe],
   templateUrl: './book-rating.component.html',
   styleUrl: './book-rating.component.scss',
 })
@@ -18,8 +19,7 @@ export class BookRatingComponent {
       (_, i) => i + 1
     );
   }
-
-  parseRating(rating: number): number {
-    return Math.floor(rating);
+  isStarHalf(index: number, rating: number): boolean {
+    return index === Math.floor(rating) && rating % 1 >= 0.5;
   }
 }
