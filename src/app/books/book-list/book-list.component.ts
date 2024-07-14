@@ -38,15 +38,20 @@ import { RouterLink } from '@angular/router';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import {
   catchError,
+  distinctUntilChanged,
   map,
   merge,
+  Observable,
   of,
-  startWith,
   Subject,
   switchMap,
+  tap,
 } from 'rxjs';
+import { isEqual } from 'lodash';
 import { Book } from '../models/book';
 import { BookRatingComponent } from '../book-rating/book-rating.component';
+import { Store } from '@ngrx/store';
+import * as BookActions from '../../books.actions';
 
 @Component({
   selector: 'bf-book-list',
@@ -76,6 +81,7 @@ import { BookRatingComponent } from '../book-rating/book-rating.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookListComponent implements AfterViewInit {
+  private store = inject(Store);
   private bookStoreService = inject(BookStoreService);
 
   listContainer = viewChild<ElementRef>('listContainer');
@@ -135,7 +141,6 @@ export class BookListComponent implements AfterViewInit {
   pageEvent: PageEvent = new PageEvent();
 
   handlePageEvent(e: PageEvent) {
-    this.isLoading.set(true);
     this.pageEvent = e;
     this.limit?.setValue(e.pageSize);
     this.currentPage.set(e.pageIndex + 1);
@@ -145,9 +150,6 @@ export class BookListComponent implements AfterViewInit {
   isSearchButtonDisabled = () => {
     return this.isbn?.invalid && !!this.isbn?.value;
   };
-
-  isLoading = signal(true);
-  books: Book[] = [];
 
   displayedColumns: string[] = [
     'title',
@@ -160,33 +162,49 @@ export class BookListComponent implements AfterViewInit {
   ];
 
   searchTrigger$ = new Subject<void>();
-  resultsLength = 0;
+
+  books$: Observable<Book[]> = this.store.select((state) => state.books.books);
+  resultsLength$ = this.store.select((state) => state.books.resultsLength);
+  isLoading$: Observable<boolean> = this.store.select(
+    (state) => state.books.isLoading
+  );
+  searchParams$ = this.store.select((state) => state.books.searchParams);
 
   ngAfterViewInit() {
-    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-    this.searchTrigger$.subscribe(() => (this.paginator.pageIndex = 0));
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.searchTrigger$.next(); // Trigger a new search on sort change
+    });
 
-    merge(this.sort.sortChange, this.paginator.page, this.searchTrigger$)
+    merge(
+      this.sort.sortChange.pipe(map(() => this.formBuilder())),
+      this.paginator.page.pipe(map(() => this.formBuilder())),
+      this.searchTrigger$.pipe(map(() => this.formBuilder()))
+    )
       .pipe(
-        startWith({}),
-        switchMap(() => {
-          this.isLoading.set(true);
-          return this.bookStoreService
-            .searchBooks(this.formBuilder())
-            .pipe(catchError(() => of(null)));
-        }),
-        map((books) => {
-          this.isLoading.set(false);
-
-          if (books === null) {
-            return [];
-          }
-
-          this.resultsLength = books.numFound;
-          return books.docs;
+        distinctUntilChanged(isEqual),
+        switchMap((searchParams) => {
+          this.store.dispatch(BookActions.loadBooks());
+          this.store.dispatch(
+            BookActions.updateSearchParams({ searchParams: searchParams })
+          );
+          return this.bookStoreService.searchBooks(searchParams).pipe(
+            tap((books) => {
+              this.store.dispatch(
+                BookActions.loadBooksSuccess({
+                  books: books.docs,
+                  resultsLength: books.numFound,
+                })
+              );
+            }),
+            catchError(() => {
+              this.store.dispatch(BookActions.loadBooksFailure());
+              return of(null);
+            })
+          );
         })
       )
-      .subscribe((books) => (this.books = books));
+      .subscribe();
   }
   formBuilder() {
     if (this.searchForm.value.publishYear) {
